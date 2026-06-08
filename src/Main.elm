@@ -24,20 +24,30 @@ import Highlight
 import MathVizPreview
 import Viz exposing (Viz)
 import Viz.Automaton
+import Viz.Bifurcation
 import Viz.Graph
 import Viz.Harmonograph
 import Viz.Ifs
+import Viz.Julia
 import Viz.Lorenz
+import Viz.MaurerRose
 import Viz.Polyhedron
+import Viz.TorusKnot
+import Viz.VectorField
 
 
 {-| The configured set of visualisations. Append your own `Viz` here. -}
 registry : List Viz
 registry =
     [ Viz.Harmonograph.viz
+    , Viz.MaurerRose.viz
     , Viz.Ifs.viz
+    , Viz.Julia.viz
     , Viz.Polyhedron.viz
+    , Viz.TorusKnot.viz
     , Viz.Lorenz.viz
+    , Viz.Bifurcation.viz
+    , Viz.VectorField.viz
     , Viz.Graph.viz
     , Viz.Automaton.viz
     ]

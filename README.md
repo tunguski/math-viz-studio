@@ -9,18 +9,24 @@ SVG result pane and the builder panels.
 Baseline for what to build toward:
 <https://en.wikipedia.org/wiki/Mathematical_visualization>.
 
-## The six visualisations
+## The visualisations
 
 Each kind of mathematics gets its **own** Elm data structure — `scene = { … }` — a different shape
 per visualisation, drawn live into SVG. The kinds span the categories of the Wikipedia article above
-(plane curves, fractals, geometry, chaos theory, graph theory, cellular automata):
+(plane curves, fractals, geometry, chaos theory, complex analysis, linear algebra, topology, graph
+theory, cellular automata):
 
 | Kind | Mathematics | Model (`scene`) |
 |---|---|---|
-| **Harmonograph** | Sums of damped sinusoids — a family of looping plane curves | two lists of oscillators `{ amp, freq, phase, decay }` for x and y, `samples`, `stroke` |
-| **Iterated function system** | A chaos-game fractal (the Barnsley fern, Sierpiński triangle, twin dragon) | a list of affine maps `{ a, b, c, d, e, f, p }`, `points`, `stroke` |
-| **Polyhedron** | A wireframe solid, rotated and projected to the plane | `vertices : List (x, y, z)`, `edges : List (i, j)`, `yaw`, `pitch`, `stroke` |
-| **Lorenz attractor** | A strange attractor — the chaotic "butterfly" flow, integrated and spun | `{ sigma, rho, beta, dt, steps, yaw, pitch, stroke }` |
+| **Harmonograph** | Sums of damped sinusoids — looping plane curves | two lists of oscillators `{ amp, freq, phase, decay }`, `samples`, `stroke` |
+| **Maurer rose** | Chords around a rose curve `r = sin(n·θ)`, stepped in degrees | `{ n, d, stroke }` |
+| **Iterated function system** | A chaos-game fractal (Barnsley fern, Sierpiński, twin dragon) | a list of affine maps `{ a, b, c, d, e, f, p }`, `points`, `stroke` |
+| **Julia set** | Escape-time fractal of `z ↦ z² + c` (complex analysis) | `{ cRe, cIm, maxIter, resolution, hue, stroke }` |
+| **Polyhedron** | A wireframe solid, rotated and projected | `vertices : List (x, y, z)`, `edges : List (i, j)`, `yaw`, `pitch`, `stroke` |
+| **Torus knot** | A `(p, q)` knot wound on a torus (topology), spun | `{ p, q, samples, yaw, pitch, stroke }` |
+| **Lorenz attractor** | A strange attractor — the chaotic "butterfly" flow | `{ sigma, rho, beta, dt, steps, yaw, pitch, stroke }` |
+| **Bifurcation diagram** | The logistic map's period-doubling route to chaos | `{ rMin, rMax, columns, iterations, settle, stroke }` |
+| **Vector field** | The phase portrait of a 2×2 linear system (linear algebra) | `{ a, b, c, d, grid, stroke }` |
 | **Force-directed graph** | A network laid out by a spring (Fruchterman–Reingold) simulation | `nodes : List String`, `edges : List (i, j)`, `iterations`, `stroke` |
 | **Cellular automaton** | An elementary Wolfram rule's space-time diagram (rule 30/90/110/…) | `{ rule, width, generations, seed : List Int, stroke }` |
 
@@ -73,7 +79,8 @@ Shared infrastructure (one place each, reused by every visualisation):
 | `Viz` | **contract** | The plugin record `Viz` (`kind`, `name`, `description`, `starter`, `movable`, `render`, `controls`) and `find`. The model type stays hidden inside each module. |
 
 The visualisations (each `src/Viz/*.elm` is model + decode/print + render + controls behind one `viz`):
-`Viz.Harmonograph`, `Viz.Ifs`, `Viz.Polyhedron`, `Viz.Lorenz`, `Viz.Graph`, `Viz.Automaton`.
+`Viz.Harmonograph`, `Viz.MaurerRose`, `Viz.Ifs`, `Viz.Julia`, `Viz.Polyhedron`, `Viz.TorusKnot`,
+`Viz.Lorenz`, `Viz.Bifurcation`, `Viz.VectorField`, `Viz.Graph`, `Viz.Automaton`.
 
 The studio shell:
 
