@@ -9,17 +9,20 @@ SVG result pane and the builder panels.
 Baseline for what to build toward:
 <https://en.wikipedia.org/wiki/Mathematical_visualization>.
 
-## The three visualisations
+## The six visualisations
 
 Each kind of mathematics gets its **own** Elm data structure — `scene = { … }` — a different shape
-per visualisation, drawn live into SVG. The three opening kinds, chosen across the categories of the
-Wikipedia article above (plane curves, fractals, geometry):
+per visualisation, drawn live into SVG. The kinds span the categories of the Wikipedia article above
+(plane curves, fractals, geometry, chaos theory, graph theory, cellular automata):
 
 | Kind | Mathematics | Model (`scene`) |
 |---|---|---|
 | **Harmonograph** | Sums of damped sinusoids — a family of looping plane curves | two lists of oscillators `{ amp, freq, phase, decay }` for x and y, `samples`, `stroke` |
 | **Iterated function system** | A chaos-game fractal (the Barnsley fern, Sierpiński triangle, twin dragon) | a list of affine maps `{ a, b, c, d, e, f, p }`, `points`, `stroke` |
 | **Polyhedron** | A wireframe solid, rotated and projected to the plane | `vertices : List (x, y, z)`, `edges : List (i, j)`, `yaw`, `pitch`, `stroke` |
+| **Lorenz attractor** | A strange attractor — the chaotic "butterfly" flow, integrated and spun | `{ sigma, rho, beta, dt, steps, yaw, pitch, stroke }` |
+| **Force-directed graph** | A network laid out by a spring (Fruchterman–Reingold) simulation | `nodes : List String`, `edges : List (i, j)`, `iterations`, `stroke` |
+| **Cellular automaton** | An elementary Wolfram rule's space-time diagram (rule 30/90/110/…) | `{ rule, width, generations, seed : List Int, stroke }` |
 
 For example, the harmonograph model is just data:
 

@@ -18,7 +18,18 @@ the live picture stay three views of one model.
 import Html exposing (Html, button, div, input, span, text)
 import Html.Attributes as Attr exposing (class)
 import Html.Events exposing (onClick, onInput)
-import Scene exposing (Affine, HarmonographData, IfsData, Pendulum, PolyhedronData, Scene(..))
+import Scene
+    exposing
+        ( Affine
+        , AutomatonData
+        , GraphData
+        , HarmonographData
+        , IfsData
+        , LorenzData
+        , Pendulum
+        , PolyhedronData
+        , Scene(..)
+        )
 
 
 {-| The "Build" panel: kind-specific controls for the current scene. -}
@@ -34,6 +45,15 @@ build _ source =
         Ok (Polyhedron d) ->
             buildPolyhedron d
 
+        Ok (Lorenz d) ->
+            buildLorenz d
+
+        Ok (Graph d) ->
+            buildGraph d
+
+        Ok (Automaton d) ->
+            buildAutomaton d
+
         Err e ->
             div [ class "mv-controls" ]
                 [ div [ class "mv-error" ] [ text ("This file isn't a scene yet — " ++ e) ] ]
@@ -46,6 +66,9 @@ gallery _ _ =
         [ galleryCard "Harmonograph" "Sums of damped sinusoids — looping plane curves." Scene.harmonographStarter
         , galleryCard "Iterated function system" "A chaos-game fractal, like the Barnsley fern." Scene.ifsStarter
         , galleryCard "Polyhedron" "A rotating wireframe solid you can spin." Scene.polyhedronStarter
+        , galleryCard "Lorenz attractor" "A strange attractor — the chaotic butterfly flow." Scene.lorenzStarter
+        , galleryCard "Force-directed graph" "A network laid out by a spring simulation." Scene.graphStarter
+        , galleryCard "Cellular automaton" "An elementary Wolfram rule, drawn row by row." Scene.automatonStarter
         ]
 
 
@@ -164,6 +187,90 @@ buildPolyhedron d =
 reshape : PolyhedronData -> PolyhedronData -> PolyhedronData
 reshape current shape =
     { shape | yaw = current.yaw, pitch = current.pitch, stroke = current.stroke }
+
+
+
+-- LORENZ ATTRACTOR --------------------------------------------------------------------------------
+
+
+buildLorenz : LorenzData -> Html String
+buildLorenz d =
+    div [ class "mv-controls" ]
+        [ group "Flow"
+            [ slider "sigma (σ)" 0 20 0.1 d.sigma (\v -> Scene.toSource (Lorenz { d | sigma = v }))
+            , slider "rho (ρ)" 0 100 0.1 d.rho (\v -> Scene.toSource (Lorenz { d | rho = v }))
+            , slider "beta (β)" 0 5 0.01 d.beta (\v -> Scene.toSource (Lorenz { d | beta = v }))
+            ]
+        , group "Integration"
+            [ slider "dt" 0.001 0.02 0.001 d.dt (\v -> Scene.toSource (Lorenz { d | dt = v }))
+            , slider "steps" 1000 16000 500 (toFloat d.steps) (\v -> Scene.toSource (Lorenz { d | steps = round v }))
+            ]
+        , group "View"
+            [ slider "pitch" 0 6.2832 0.01 d.pitch (\v -> Scene.toSource (Lorenz { d | pitch = v }))
+            , colorRow "stroke" d.stroke (\s -> Scene.toSource (Lorenz { d | stroke = s }))
+            ]
+        , group "Presets"
+            [ div [ class "mv-presets" ]
+                [ preset "Classic ρ=28" (Scene.toSource (Lorenz { d | rho = 28 }))
+                , preset "Stable ρ=14" (Scene.toSource (Lorenz { d | rho = 14 }))
+                , preset "Wild ρ=99.96" (Scene.toSource (Lorenz { d | rho = 99.96 }))
+                ]
+            ]
+        , div [ class "mv-hint" ] [ text "The attractor spins while it animates (yaw is the clock)." ]
+        ]
+
+
+
+-- FORCE-DIRECTED GRAPH ----------------------------------------------------------------------------
+
+
+buildGraph : GraphData -> Html String
+buildGraph d =
+    div [ class "mv-controls" ]
+        [ group "Layout"
+            [ slider "iterations" 10 300 5 (toFloat d.iterations) (\v -> Scene.toSource (Graph { d | iterations = round v }))
+            , colorRow "stroke" d.stroke (\s -> Scene.toSource (Graph { d | stroke = s }))
+            ]
+        , group "Presets"
+            [ div [ class "mv-presets" ]
+                [ preset "Wheel" (Scene.toSource (Graph (regraph d Scene.graphWheel)))
+                , preset "Prism" (Scene.toSource (Graph (regraph d Scene.graphPrism)))
+                , preset "K5" (Scene.toSource (Graph (regraph d Scene.graphComplete)))
+                ]
+            ]
+        , div [ class "mv-hint" ] [ text "Edit nodes and edges directly in the Code tab." ]
+        ]
+
+
+{-| Adopt a preset graph but keep the iteration count and colour the user already chose. -}
+regraph : GraphData -> GraphData -> GraphData
+regraph current shape =
+    { shape | iterations = current.iterations, stroke = current.stroke }
+
+
+
+-- CELLULAR AUTOMATON ------------------------------------------------------------------------------
+
+
+buildAutomaton : AutomatonData -> Html String
+buildAutomaton d =
+    div [ class "mv-controls" ]
+        [ group "Rule"
+            [ slider "rule" 0 255 1 (toFloat d.rule) (\v -> Scene.toSource (Automaton { d | rule = round v }))
+            , div [ class "mv-presets" ]
+                [ preset "30" (Scene.toSource (Automaton { d | rule = 30 }))
+                , preset "90" (Scene.toSource (Automaton { d | rule = 90 }))
+                , preset "110" (Scene.toSource (Automaton { d | rule = 110 }))
+                , preset "184" (Scene.toSource (Automaton { d | rule = 184 }))
+                ]
+            ]
+        , group "Grid"
+            [ slider "width" 21 201 2 (toFloat d.width) (\v -> Scene.toSource (Automaton { d | width = round v }))
+            , slider "generations" 10 160 1 (toFloat d.generations) (\v -> Scene.toSource (Automaton { d | generations = round v }))
+            , colorRow "stroke" d.stroke (\s -> Scene.toSource (Automaton { d | stroke = s }))
+            ]
+        , div [ class "mv-hint" ] [ text "Seed cells (column offsets from centre) live in the Code tab." ]
+        ]
 
 
 

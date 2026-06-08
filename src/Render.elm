@@ -12,11 +12,27 @@ lets the curve precess and the polyhedron spin; static kinds simply ignore it.
     tens of thousands of points stay cheap to render).
   - **Polyhedron**: rotate every vertex by yaw/pitch, project with a little perspective, and stroke
     the edges as `<line>`s with the vertices as dots.
+  - **Lorenz attractor**: integrate the flow, rotate the 3-D trajectory by yaw/pitch and stroke it as
+    one `<polyline>` (the yaw spins with `phase`).
+  - **Force-directed graph**: relax a spring layout, then draw edges as `<line>`s and nodes as
+    labelled dots.
+  - **Cellular automaton**: evolve the Wolfram rule and draw every live cell as one filled `<path>`.
 
 -}
 
 import Array exposing (Array)
-import Scene exposing (Affine, HarmonographData, IfsData, PolyhedronData, Scene(..), Vec3)
+import Scene
+    exposing
+        ( Affine
+        , AutomatonData
+        , GraphData
+        , HarmonographData
+        , IfsData
+        , LorenzData
+        , PolyhedronData
+        , Scene(..)
+        , Vec3
+        )
 import Svg exposing (Svg)
 import Svg.Attributes as A
 
@@ -33,6 +49,15 @@ view phase scene =
 
         Polyhedron d ->
             polyhedron phase d
+
+        Lorenz d ->
+            lorenz phase d
+
+        Graph d ->
+            graph d
+
+        Automaton d ->
+            automaton d
 
 
 {-| The shared frame: a centred 600×600 viewBox the renderers draw into. -}
@@ -314,6 +339,395 @@ project yaw pitch v =
             4 / (4 + z2)
     in
     ( x1 * scale * f, -y2 * scale * f )
+
+
+
+-- LORENZ ATTRACTOR --------------------------------------------------------------------------------
+
+
+lorenz : Float -> LorenzData -> Svg msg
+lorenz phase d =
+    let
+        path3 =
+            integrateLorenz d
+
+        c =
+            centroid path3
+
+        yaw =
+            d.yaw + phase
+
+        proj =
+            List.map (\p -> rotate2 yaw d.pitch { x = p.x - c.x, y = p.y - c.y, z = p.z - c.z }) path3
+
+        ( cx, cy, scale ) =
+            fitTransform proj
+
+        toScreen ( x, y ) =
+            r2 ((x - cx) * scale) ++ "," ++ r2 (-(y - cy) * scale)
+
+        pts =
+            String.join " " (List.map toScreen proj)
+    in
+    stage
+        [ Svg.polyline
+            [ A.points pts
+            , A.fill "none"
+            , A.stroke d.stroke
+            , A.strokeWidth "1"
+            , A.strokeLinecap "round"
+            , A.opacity "0.9"
+            ]
+            []
+        ]
+
+
+{-| Euler-integrate the Lorenz system from a point just off the origin. -}
+integrateLorenz : LorenzData -> List Vec3
+integrateLorenz d =
+    let
+        steps =
+            clamp 100 20000 d.steps
+
+        step _ ( p, acc ) =
+            let
+                dx =
+                    d.sigma * (p.y - p.x)
+
+                dy =
+                    p.x * (d.rho - p.z) - p.y
+
+                dz =
+                    p.x * p.y - d.beta * p.z
+
+                np =
+                    { x = p.x + dx * d.dt, y = p.y + dy * d.dt, z = p.z + dz * d.dt }
+            in
+            ( np, np :: acc )
+
+        ( _, pts ) =
+            List.foldl step ( { x = 0.1, y = 0, z = 0 }, [] ) (List.range 1 steps)
+    in
+    List.reverse pts
+
+
+centroid : List Vec3 -> Vec3
+centroid ps =
+    let
+        n =
+            max 1 (List.length ps)
+
+        sum =
+            List.foldl (\p a -> { x = a.x + p.x, y = a.y + p.y, z = a.z + p.z }) { x = 0, y = 0, z = 0 } ps
+    in
+    { x = sum.x / toFloat n, y = sum.y / toFloat n, z = sum.z / toFloat n }
+
+
+{-| Orthographic rotation by yaw (about Y) then pitch (about X), dropping z. -}
+rotate2 : Float -> Float -> Vec3 -> ( Float, Float )
+rotate2 yaw pitch v =
+    let
+        x1 =
+            v.x * cos yaw + v.z * sin yaw
+
+        z1 =
+            -v.x * sin yaw + v.z * cos yaw
+
+        y2 =
+            v.y * cos pitch - z1 * sin pitch
+    in
+    ( x1, y2 )
+
+
+
+-- FORCE-DIRECTED GRAPH ----------------------------------------------------------------------------
+
+
+graph : GraphData -> Svg msg
+graph d =
+    let
+        nN =
+            List.length d.nodes
+
+        positions =
+            layout nN d.edges (clamp 1 400 d.iterations)
+
+        ( cx, cy, scale ) =
+            fitTransform positions
+
+        place ( x, y ) =
+            ( (x - cx) * scale, -(y - cy) * scale )
+
+        placed =
+            Array.fromList (List.map place positions)
+
+        edgeLine ( a, b ) =
+            case ( Array.get a placed, Array.get b placed ) of
+                ( Just ( x1, y1 ), Just ( x2, y2 ) ) ->
+                    Just
+                        (Svg.line
+                            [ A.x1 (r2 x1)
+                            , A.y1 (r2 y1)
+                            , A.x2 (r2 x2)
+                            , A.y2 (r2 y2)
+                            , A.stroke d.stroke
+                            , A.strokeWidth "1.6"
+                            , A.opacity "0.5"
+                            ]
+                            []
+                        )
+
+                _ ->
+                    Nothing
+
+        -- the JS backend has no <text> element, so a node is a filled dot with a brighter rim
+        node ( x, y ) =
+            Svg.circle
+                [ A.cx (r2 x), A.cy (r2 y), A.r "9", A.fill d.stroke, A.opacity "0.95" ]
+                []
+
+        nodeSvgs =
+            List.map node (Array.toList placed)
+    in
+    stage (List.filterMap edgeLine d.edges ++ nodeSvgs)
+
+
+{-| A Fruchterman–Reingold spring layout: nodes start on a circle, then relax under edge attraction
+and all-pairs repulsion, cooling each round. Returns a position per node (index-aligned). -}
+layout : Int -> List ( Int, Int ) -> Int -> List ( Float, Float )
+layout nN edges iters =
+    let
+        k =
+            1.0
+
+        init =
+            List.map
+                (\i ->
+                    let
+                        a =
+                            2 * pi * toFloat i / toFloat (max 1 nN)
+                    in
+                    ( cos a, sin a )
+                )
+                (List.range 0 (nN - 1))
+
+        go temp positions remaining =
+            if remaining <= 0 then
+                positions
+
+            else
+                go (temp * 0.95) (frStep edges k temp positions) (remaining - 1)
+    in
+    go (k * 0.4) init iters
+
+
+frStep : List ( Int, Int ) -> Float -> Float -> List ( Float, Float ) -> List ( Float, Float )
+frStep edges k temp positions =
+    let
+        arr =
+            Array.fromList positions
+
+        nN =
+            Array.length arr
+
+        getp i =
+            Maybe.withDefault ( 0, 0 ) (Array.get i arr)
+
+        -- start each node's displacement with repulsion from every other node
+        repDisp =
+            Array.fromList
+                (List.map
+                    (\i ->
+                        List.foldl
+                            (\j ( dx, dy ) ->
+                                if j == i then
+                                    ( dx, dy )
+
+                                else
+                                    let
+                                        ( xi, yi ) =
+                                            getp i
+
+                                        ( xj, yj ) =
+                                            getp j
+
+                                        ux =
+                                            xi - xj
+
+                                        uy =
+                                            yi - yj
+
+                                        dist =
+                                            sqrt (ux * ux + uy * uy) + 0.001
+
+                                        force =
+                                            k * k / dist
+                                    in
+                                    ( dx + ux / dist * force, dy + uy / dist * force )
+                            )
+                            ( 0, 0 )
+                            (List.range 0 (nN - 1))
+                    )
+                    (List.range 0 (nN - 1))
+                )
+
+        -- then pull edge endpoints together
+        disp =
+            List.foldl
+                (\( a, b ) acc ->
+                    let
+                        ( xa, ya ) =
+                            getp a
+
+                        ( xb, yb ) =
+                            getp b
+
+                        ux =
+                            xa - xb
+
+                        uy =
+                            ya - yb
+
+                        dist =
+                            sqrt (ux * ux + uy * uy) + 0.001
+
+                        force =
+                            dist * dist / k
+
+                        fx =
+                            ux / dist * force
+
+                        fy =
+                            uy / dist * force
+
+                        bump idx gx gy d2 =
+                            case Array.get idx d2 of
+                                Just ( dx, dy ) ->
+                                    Array.set idx ( dx + gx, dy + gy ) d2
+
+                                Nothing ->
+                                    d2
+                    in
+                    bump b fx fy (bump a (-fx) (-fy) acc)
+                )
+                repDisp
+                edges
+    in
+    List.indexedMap
+        (\i ( x, y ) ->
+            case Array.get i disp of
+                Just ( dx, dy ) ->
+                    let
+                        d =
+                            sqrt (dx * dx + dy * dy) + 0.0001
+
+                        lim =
+                            min d temp
+                    in
+                    ( x + dx / d * lim, y + dy / d * lim )
+
+                Nothing ->
+                    ( x, y )
+        )
+        positions
+
+
+
+-- CELLULAR AUTOMATON ------------------------------------------------------------------------------
+
+
+automaton : AutomatonData -> Svg msg
+automaton d =
+    let
+        w =
+            clamp 5 251 d.width
+
+        gens =
+            clamp 1 200 d.generations
+
+        center =
+            w // 2
+
+        row0 =
+            Array.fromList
+                (List.map (\col -> List.member (col - center) d.seed) (List.range 0 (w - 1)))
+
+        rows =
+            buildRows d.rule gens row0
+
+        cell =
+            580 / toFloat (max w gens)
+
+        ox =
+            -(toFloat w * cell) / 2
+
+        oy =
+            -(toFloat gens * cell) / 2
+
+        squares =
+            String.concat
+                (List.concat
+                    (List.indexedMap
+                        (\g rowArr ->
+                            List.filterMap
+                                (\col ->
+                                    if Maybe.withDefault False (Array.get col rowArr) then
+                                        Just (square (ox + toFloat col * cell) (oy + toFloat g * cell) cell)
+
+                                    else
+                                        Nothing
+                                )
+                                (List.range 0 (w - 1))
+                        )
+                        rows
+                    )
+                )
+    in
+    stage [ Svg.path [ A.d squares, A.fill d.stroke, A.opacity "0.95" ] [] ]
+
+
+square : Float -> Float -> Float -> String
+square x y s =
+    "M" ++ r1 x ++ " " ++ r1 y ++ "h" ++ r1 s ++ "v" ++ r1 s ++ "h" ++ r1 (-s) ++ "z"
+
+
+{-| Evolve `gens` rows from `row0` under the elementary rule. -}
+buildRows : Int -> Int -> Array Bool -> List (Array Bool)
+buildRows rule gens row0 =
+    let
+        go remaining cur acc =
+            if remaining <= 0 then
+                List.reverse acc
+
+            else
+                go (remaining - 1) (nextRow rule cur) (cur :: acc)
+    in
+    go gens row0 []
+
+
+nextRow : Int -> Array Bool -> Array Bool
+nextRow rule cur =
+    let
+        w =
+            Array.length cur
+
+        bitAt i =
+            if Maybe.withDefault False (Array.get i cur) then
+                1
+
+            else
+                0
+    in
+    Array.fromList
+        (List.map
+            (\i -> ruleBit rule (4 * bitAt (i - 1) + 2 * bitAt i + bitAt (i + 1)))
+            (List.range 0 (w - 1))
+        )
+
+
+ruleBit : Int -> Int -> Bool
+ruleBit rule idx =
+    modBy 2 (rule // (2 ^ idx)) == 1
 
 
 

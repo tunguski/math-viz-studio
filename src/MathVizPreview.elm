@@ -90,13 +90,17 @@ subscriptions _ model =
 movable : Maybe Scene -> Bool
 movable scene =
     case scene of
-        Just (Scene.Ifs _) ->
-            False
-
-        Just _ ->
+        Just (Scene.Harmonograph _) ->
             True
 
-        Nothing ->
+        Just (Scene.Polyhedron _) ->
+            True
+
+        Just (Scene.Lorenz _) ->
+            True
+
+        _ ->
+            -- IFS, graph and automaton are static (no phase term in their render)
             False
 
 

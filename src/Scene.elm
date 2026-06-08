@@ -3,19 +3,24 @@ module Scene exposing
     , HarmonographData, Pendulum
     , IfsData, Affine
     , PolyhedronData, Vec3
+    , LorenzData, GraphData, AutomatonData
     , parse, toSource, kindName
     , harmonographStarter, ifsStarter, polyhedronStarter
+    , lorenzStarter, graphStarter, automatonStarter
     , ifsFern, ifsSierpinski, ifsDragon
     , cube, tetrahedron, octahedron
+    , graphWheel, graphPrism, graphComplete
     )
 
 {-| The **mathematical model** that each visualisation renders — and the bridge between it and the
 Elm source the user edits.
 
-A scene is one of three independent data structures, each a faithful Elm record literal: a
-**harmonograph** (sums of damped sinusoids — a family of plane curves), an **iterated function
-system** (a chaos-game fractal such as the Barnsley fern), and a **polyhedron** wireframe (vertices
-and edges of a solid, projected). The visual builder is bidirectional, so this module is the hinge:
+A scene is one of six independent data structures, each a faithful Elm record literal — a
+**harmonograph** (sums of damped sinusoids), an **iterated function system** (a chaos-game fractal
+such as the Barnsley fern), a **polyhedron** wireframe, a **Lorenz attractor** (an integrated chaotic
+flow), a **force-directed graph** (a network laid out by a spring simulation), and a **cellular
+automaton** (an elementary Wolfram rule's space-time diagram). The visual builder is bidirectional,
+so this module is the hinge:
 
   - `parse` reads the `scene = { … }` definition out of an Elm source string into a typed `Scene`.
     It is a small, self-contained reader of the Elm *value* sublanguage (records, lists, tuples,
@@ -34,6 +39,9 @@ type Scene
     = Harmonograph HarmonographData
     | Ifs IfsData
     | Polyhedron PolyhedronData
+    | Lorenz LorenzData
+    | Graph GraphData
+    | Automaton AutomatonData
 
 
 {-| A harmonograph: two lists of damped oscillators driving the x and y of a pen. The traced curve is
@@ -81,6 +89,41 @@ type alias Vec3 =
     { x : Float, y : Float, z : Float }
 
 
+{-| A Lorenz attractor: the parameters and step count of the chaotic flow
+`x' = σ(y−x)`, `y' = x(ρ−z) − y`, `z' = xy − βz`, integrated and projected (spun by `yaw`/`pitch`). -}
+type alias LorenzData =
+    { sigma : Float
+    , rho : Float
+    , beta : Float
+    , dt : Float
+    , steps : Int
+    , yaw : Float
+    , pitch : Float
+    , stroke : String
+    }
+
+
+{-| A force-directed graph: named nodes and the edges (index pairs) between them, laid out by
+`iterations` of a spring simulation. The model *is* the graph. -}
+type alias GraphData =
+    { nodes : List String
+    , edges : List ( Int, Int )
+    , iterations : Int
+    , stroke : String
+    }
+
+
+{-| An elementary cellular automaton: a Wolfram `rule` (0–255) evolved for `generations` rows over a
+strip `width` cells wide, from the `seed` cells (column offsets from the centre, initially on). -}
+type alias AutomatonData =
+    { rule : Int
+    , width : Int
+    , generations : Int
+    , seed : List Int
+    , stroke : String
+    }
+
+
 {-| A human label for a scene's kind, for the preview toolbar. -}
 kindName : Scene -> String
 kindName scene =
@@ -93,6 +136,15 @@ kindName scene =
 
         Polyhedron _ ->
             "polyhedron"
+
+        Lorenz _ ->
+            "Lorenz attractor"
+
+        Graph _ ->
+            "force-directed graph"
+
+        Automaton _ ->
+            "cellular automaton"
 
 
 
@@ -413,6 +465,15 @@ decodeScene v =
                                 "polyhedron" ->
                                     Result.map Polyhedron (decodePoly fs)
 
+                                "lorenz" ->
+                                    Result.map Lorenz (decodeLorenz fs)
+
+                                "graph" ->
+                                    Result.map Graph (decodeGraph fs)
+
+                                "automaton" ->
+                                    Result.map Automaton (decodeAutomaton fs)
+
                                 _ ->
                                     Err ("Unknown kind: " ++ k)
                         )
@@ -499,6 +560,42 @@ decodeEdge v =
 
         _ ->
             Err "Expected a 2-tuple edge like ( 0, 1 )"
+
+
+decodeLorenz : List ( String, V ) -> Result String LorenzData
+decodeLorenz fs =
+    Result.map5 (\sigma rho beta dt steps -> ( sigma, rho, ( beta, dt, steps ) ))
+        (numField "sigma" fs)
+        (numField "rho" fs)
+        (numField "beta" fs)
+        (numField "dt" fs)
+        (intField "steps" fs)
+        |> Result.andThen
+            (\( sigma, rho, ( beta, dt, steps ) ) ->
+                Result.map3 (\yaw pitch stroke -> LorenzData sigma rho beta dt steps yaw pitch stroke)
+                    (numField "yaw" fs)
+                    (numField "pitch" fs)
+                    (strField "stroke" fs)
+            )
+
+
+decodeGraph : List ( String, V ) -> Result String GraphData
+decodeGraph fs =
+    Result.map4 GraphData
+        (listField "nodes" fs |> Result.andThen (traverse asStr))
+        (listField "edges" fs |> Result.andThen (traverse decodeEdge))
+        (intField "iterations" fs)
+        (strField "stroke" fs)
+
+
+decodeAutomaton : List ( String, V ) -> Result String AutomatonData
+decodeAutomaton fs =
+    Result.map5 AutomatonData
+        (intField "rule" fs)
+        (intField "width" fs)
+        (intField "generations" fs)
+        (listField "seed" fs |> Result.andThen (traverse (\x -> Result.map round (asNum x))))
+        (strField "stroke" fs)
 
 
 
@@ -602,6 +699,15 @@ toSource scene =
         Polyhedron d ->
             polySource d
 
+        Lorenz d ->
+            lorenzSource d
+
+        Graph d ->
+            graphSource d
+
+        Automaton d ->
+            automatonSource d
+
 
 header : String
 header =
@@ -680,6 +786,61 @@ edgeStr ( i, j ) =
     "( " ++ String.fromInt i ++ ", " ++ String.fromInt j ++ " )"
 
 
+lorenzSource : LorenzData -> String
+lorenzSource d =
+    header
+        ++ "    { kind = \"lorenz\"\n"
+        ++ "    , sigma = "
+        ++ n d.sigma
+        ++ "\n    , rho = "
+        ++ n d.rho
+        ++ "\n    , beta = "
+        ++ n d.beta
+        ++ "\n    , dt = "
+        ++ n d.dt
+        ++ "\n    , steps = "
+        ++ String.fromInt d.steps
+        ++ "\n    , yaw = "
+        ++ n d.yaw
+        ++ "\n    , pitch = "
+        ++ n d.pitch
+        ++ "\n    , stroke = \""
+        ++ d.stroke
+        ++ "\"\n    }\n"
+
+
+graphSource : GraphData -> String
+graphSource d =
+    header
+        ++ "    { kind = \"graph\"\n"
+        ++ "    , nodes =\n        "
+        ++ renderList "        " (List.map (\name -> "\"" ++ name ++ "\"") d.nodes)
+        ++ "\n    , edges =\n        "
+        ++ renderList "        " (List.map edgeStr d.edges)
+        ++ "\n    , iterations = "
+        ++ String.fromInt d.iterations
+        ++ "\n    , stroke = \""
+        ++ d.stroke
+        ++ "\"\n    }\n"
+
+
+automatonSource : AutomatonData -> String
+automatonSource d =
+    header
+        ++ "    { kind = \"automaton\"\n"
+        ++ "    , rule = "
+        ++ String.fromInt d.rule
+        ++ "\n    , width = "
+        ++ String.fromInt d.width
+        ++ "\n    , generations = "
+        ++ String.fromInt d.generations
+        ++ "\n    , seed = "
+        ++ renderList "        " (List.map String.fromInt d.seed)
+        ++ "\n    , stroke = \""
+        ++ d.stroke
+        ++ "\"\n    }\n"
+
+
 {-| Lay a list of already-rendered items out one per line, Elm-style: `[ first`, then `, item`
 lines, then a closing `]`, each continuation indented by `indent`. -}
 renderList : String -> List String -> String
@@ -701,7 +862,7 @@ renderList indent items =
 -- STARTERS & PRESETS ------------------------------------------------------------------------------
 
 
-{-| The three gallery starters, as source the editor opens with / switches to. -}
+{-| The gallery starters, as source the editor opens with / switches to. -}
 harmonographStarter : String
 harmonographStarter =
     toSource
@@ -829,4 +990,80 @@ octahedron =
     , yaw = 0.7
     , pitch = 0.5
     , stroke = "#7cfc9b"
+    }
+
+
+lorenzStarter : String
+lorenzStarter =
+    toSource
+        (Lorenz
+            { sigma = 10
+            , rho = 28
+            , beta = 2.6667
+            , dt = 0.006
+            , steps = 9000
+            , yaw = 0.6
+            , pitch = 0.2
+            , stroke = "#ffb347"
+            }
+        )
+
+
+graphStarter : String
+graphStarter =
+    toSource (Graph graphWheel)
+
+
+automatonStarter : String
+automatonStarter =
+    toSource
+        (Automaton
+            { rule = 30
+            , width = 121
+            , generations = 70
+            , seed = [ 0 ]
+            , stroke = "#9b8cff"
+            }
+        )
+
+
+{-| A wheel graph: a hub joined to a ring of six. -}
+graphWheel : GraphData
+graphWheel =
+    { nodes = [ "hub", "a", "b", "c", "d", "e", "f" ]
+    , edges =
+        [ ( 0, 1 ), ( 0, 2 ), ( 0, 3 ), ( 0, 4 ), ( 0, 5 ), ( 0, 6 )
+        , ( 1, 2 ), ( 2, 3 ), ( 3, 4 ), ( 4, 5 ), ( 5, 6 ), ( 6, 1 )
+        ]
+    , iterations = 120
+    , stroke = "#5fd0ff"
+    }
+
+
+{-| A triangular prism graph. -}
+graphPrism : GraphData
+graphPrism =
+    { nodes = [ "a", "b", "c", "d", "e", "f" ]
+    , edges =
+        [ ( 0, 1 ), ( 1, 2 ), ( 2, 0 )
+        , ( 3, 4 ), ( 4, 5 ), ( 5, 3 )
+        , ( 0, 3 ), ( 1, 4 ), ( 2, 5 )
+        ]
+    , iterations = 120
+    , stroke = "#7cfc9b"
+    }
+
+
+{-| The complete graph on five nodes, K5 — every pair joined. -}
+graphComplete : GraphData
+graphComplete =
+    { nodes = [ "1", "2", "3", "4", "5" ]
+    , edges =
+        [ ( 0, 1 ), ( 0, 2 ), ( 0, 3 ), ( 0, 4 )
+        , ( 1, 2 ), ( 1, 3 ), ( 1, 4 )
+        , ( 2, 3 ), ( 2, 4 )
+        , ( 3, 4 )
+        ]
+    , iterations = 120
+    , stroke = "#ff9cee"
     }
