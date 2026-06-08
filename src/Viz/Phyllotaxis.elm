@@ -137,6 +137,9 @@ controls source =
                         [ Form.preset "Golden 137.5°" (toSource { d | angle = 137.5 })
                         , Form.preset "137.3°" (toSource { d | angle = 137.3 })
                         , Form.preset "137.6°" (toSource { d | angle = 137.6 })
+                        , Form.preset "Fermat 99.5°" (toSource { d | angle = 99.5 })
+                        , Form.preset "Loose" (toSource { d | spread = 13 })
+                        , Form.preset "Dense" (toSource { d | spread = 6, count = 1500 })
                         ]
                     ]
                 , Form.hint "Try the Gradient colour mode to paint the spiral order."

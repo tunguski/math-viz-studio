@@ -200,6 +200,9 @@ controls source =
                         , Form.preset "Rotation" (toSource rotation)
                         , Form.preset "Saddle" (toSource saddle)
                         , Form.preset "Node" (toSource node)
+                        , Form.preset "Sink" (toSource sink)
+                        , Form.preset "Shear" (toSource shear)
+                        , Form.preset "Centre" (toSource centre)
                         ]
                     ]
                 ]
@@ -227,3 +230,18 @@ saddle =
 node : Model
 node =
     { a = 1, b = 0, c = 0, d = 1, grid = 15, stroke = "#7cfc9b" }
+
+
+sink : Model
+sink =
+    { a = -1, b = 0, c = 0, d = -1, grid = 15, stroke = "#5fd0ff" }
+
+
+shear : Model
+shear =
+    { a = 1, b = 1, c = 0, d = 1, grid = 15, stroke = "#fcd34d" }
+
+
+centre : Model
+centre =
+    { a = 0, b = -2, c = 0.5, d = 0, grid = 15, stroke = "#86efac" }

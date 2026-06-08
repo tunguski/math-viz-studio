@@ -151,6 +151,9 @@ controls source =
                         , Form.preset "4 · 7" (toSource { d | n = 4, m = 7 })
                         , Form.preset "1 · 6" (toSource { d | n = 1, m = 6 })
                         , Form.preset "5 · 8" (toSource { d | n = 5, m = 8 })
+                        , Form.preset "2 · 3" (toSource { d | n = 2, m = 3 })
+                        , Form.preset "6 · 9" (toSource { d | n = 6, m = 9 })
+                        , Form.preset "3 · 8" (toSource { d | n = 3, m = 8 })
                         ]
                     ]
                 ]

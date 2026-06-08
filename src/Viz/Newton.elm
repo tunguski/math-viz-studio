@@ -247,4 +247,14 @@ controls source =
                     [ Form.slider "max iterations" 8 80 1 (toFloat d.maxIter) (\v -> toSource { d | maxIter = round v })
                     , Form.slider "resolution" 40 150 2 (toFloat d.resolution) (\v -> toSource { d | resolution = round v })
                     ]
+                , Form.group "Palette"
+                    [ Form.presets
+                        [ Form.preset "Classic" (toSource { d | hue = 0 })
+                        , Form.preset "Ocean" (toSource { d | hue = 200 })
+                        , Form.preset "Forest" (toSource { d | hue = 120 })
+                        , Form.preset "Ember" (toSource { d | hue = 30 })
+                        , Form.preset "Violet" (toSource { d | hue = 280 })
+                        , Form.preset "Fine" (toSource { d | maxIter = 50, resolution = 140 })
+                        ]
+                    ]
                 ]

@@ -178,6 +178,9 @@ controls source =
                         [ Form.preset "Classic" (toSource { d | a = 0.2, b = 0.2, c = 5.7 })
                         , Form.preset "Period-2" (toSource { d | a = 0.2, b = 0.2, c = 4 })
                         , Form.preset "Banded" (toSource { d | a = 0.1, b = 0.1, c = 14 })
+                        , Form.preset "Spiral c=9" (toSource { d | a = 0.2, b = 0.2, c = 9 })
+                        , Form.preset "Funnel c=18" (toSource { d | a = 0.2, b = 0.2, c = 18 })
+                        , Form.preset "Thin a=0.1" (toSource { d | a = 0.1, b = 0.2, c = 5.7 })
                         ]
                     ]
                 ]

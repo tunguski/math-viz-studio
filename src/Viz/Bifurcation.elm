@@ -173,6 +173,9 @@ controls source =
                         [ Form.preset "Full 2.5–4" (toSource { d | rMin = 2.5, rMax = 4 })
                         , Form.preset "Doubling 3.4–3.6" (toSource { d | rMin = 3.4, rMax = 3.6 })
                         , Form.preset "Chaos 3.83–3.86" (toSource { d | rMin = 3.83, rMax = 3.86 })
+                        , Form.preset "Window 3.625–3.635" (toSource { d | rMin = 3.625, rMax = 3.635 })
+                        , Form.preset "Onset 3.56–3.58" (toSource { d | rMin = 3.56, rMax = 3.58 })
+                        , Form.preset "Wide 2.8–4" (toSource { d | rMin = 2.8, rMax = 4 })
                         ]
                     ]
                 ]

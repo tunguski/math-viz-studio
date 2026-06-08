@@ -119,6 +119,9 @@ controls source =
                         , Form.preset "2 · 39" (toSource { d | n = 2, d = 39 })
                         , Form.preset "5 · 97" (toSource { d | n = 5, d = 97 })
                         , Form.preset "7 · 19" (toSource { d | n = 7, d = 19 })
+                        , Form.preset "3 · 47" (toSource { d | n = 3, d = 47 })
+                        , Form.preset "8 · 45" (toSource { d | n = 8, d = 45 })
+                        , Form.preset "4 · 83" (toSource { d | n = 4, d = 83 })
                         ]
                     ]
                 ]

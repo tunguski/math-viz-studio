@@ -164,6 +164,9 @@ controls source =
                         , Form.preset "Starfish" (toSource { d | m = 5, n1 = 2, n2 = 7, n3 = 7 })
                         , Form.preset "Gear" (toSource { d | m = 12, n1 = 0.3, n2 = 0.3, n3 = 0.3 })
                         , Form.preset "Blob" (toSource { d | m = 3, n1 = 5, n2 = 18, n3 = 18 })
+                        , Form.preset "Star" (toSource { d | m = 6, n1 = 40, n2 = 10, n3 = 10 })
+                        , Form.preset "Snowflake" (toSource { d | m = 6, n1 = 0.5, n2 = 0.5, n3 = 0.5 })
+                        , Form.preset "Bloom" (toSource { d | m = 8, n1 = 1, n2 = 1, n3 = 8 })
                         ]
                     ]
                 ]

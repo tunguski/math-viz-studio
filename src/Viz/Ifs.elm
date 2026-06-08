@@ -209,6 +209,9 @@ controls source =
                         [ Form.preset "Barnsley fern" (toSource fern)
                         , Form.preset "Sierpiński" (toSource sierpinski)
                         , Form.preset "Twin dragon" (toSource dragon)
+                        , Form.preset "Lévy curve" (toSource levy)
+                        , Form.preset "Maple leaf" (toSource maple)
+                        , Form.preset "Spiral" (toSource spiral)
                         ]
                     ]
                 , Form.group "Affine maps"
@@ -274,4 +277,42 @@ dragon =
         ]
     , points = 16000
     , stroke = "#ff9cee"
+    }
+
+
+{-| The Lévy C curve. -}
+levy : Model
+levy =
+    { maps =
+        [ { a = 0.5, b = -0.5, c = 0.5, d = 0.5, e = 0, f = 0, p = 0.5 }
+        , { a = 0.5, b = 0.5, c = -0.5, d = 0.5, e = 0.5, f = 0.5, p = 0.5 }
+        ]
+    , points = 16000
+    , stroke = "#7dd3fc"
+    }
+
+
+{-| Barnsley's maple leaf — four affine maps. -}
+maple : Model
+maple =
+    { maps =
+        [ { a = 0.14, b = 0.01, c = 0, d = 0.51, e = -0.08, f = -1.31, p = 0.25 }
+        , { a = 0.43, b = 0.52, c = -0.45, d = 0.5, e = 1.49, f = -0.75, p = 0.25 }
+        , { a = 0.45, b = -0.49, c = 0.47, d = 0.47, e = -1.62, f = -0.74, p = 0.25 }
+        , { a = 0.49, b = 0, c = 0, d = 0.51, e = 0.02, f = 1.62, p = 0.25 }
+        ]
+    , points = 16000
+    , stroke = "#fca5f1"
+    }
+
+
+{-| A logarithmic spiral attractor — one rotating contraction plus a seed. -}
+spiral : Model
+spiral =
+    { maps =
+        [ { a = 0.787879, b = -0.424242, c = 0.242424, d = 0.859848, e = 1.758647, f = 1.408065, p = 0.9 }
+        , { a = -0.121212, b = 0.257576, c = 0.151515, d = 0.05303, e = -6.721654, f = 1.377236, p = 0.1 }
+        ]
+    , points = 18000
+    , stroke = "#fbbf24"
     }

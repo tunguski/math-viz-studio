@@ -219,6 +219,9 @@ controls source =
                         , Form.preset "Dendrite" (toSource { d | cRe = 0, cIm = 1 })
                         , Form.preset "San Marco" (toSource { d | cRe = -0.75, cIm = 0 })
                         , Form.preset "Spiral" (toSource { d | cRe = -0.4, cIm = 0.6 })
+                        , Form.preset "Siegel" (toSource { d | cRe = -0.391, cIm = -0.587 })
+                        , Form.preset "Galaxy" (toSource { d | cRe = 0.285, cIm = 0.01 })
+                        , Form.preset "Lightning" (toSource { d | cRe = -0.8, cIm = 0.156 })
                         ]
                     ]
                 ]

@@ -171,6 +171,9 @@ controls source =
                         , Form.preset "3·2" (toSource { d | p = 3, q = 2 })
                         , Form.preset "2·5" (toSource { d | p = 2, q = 5 })
                         , Form.preset "3·4" (toSource { d | p = 3, q = 4 })
+                        , Form.preset "Cinquefoil 2·7" (toSource { d | p = 2, q = 7 })
+                        , Form.preset "5·3" (toSource { d | p = 5, q = 3 })
+                        , Form.preset "4·5" (toSource { d | p = 4, q = 5 })
                         ]
                     ]
                 , Form.hint "The knot spins while it animates (yaw is the clock)."

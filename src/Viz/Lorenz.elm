@@ -180,6 +180,9 @@ controls source =
                         [ Form.preset "Classic ρ=28" (toSource { d | rho = 28 })
                         , Form.preset "Stable ρ=14" (toSource { d | rho = 14 })
                         , Form.preset "Wild ρ=99.96" (toSource { d | rho = 99.96 })
+                        , Form.preset "Onset ρ=24" (toSource { d | rho = 24 })
+                        , Form.preset "Pre-chaos ρ=22" (toSource { d | rho = 22 })
+                        , Form.preset "Hyper ρ=160" (toSource { d | rho = 160 })
                         ]
                     ]
                 , Form.hint "The attractor spins while it animates (yaw is the clock)."

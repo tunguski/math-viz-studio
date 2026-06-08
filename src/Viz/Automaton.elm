@@ -196,6 +196,9 @@ controls source =
                         , Form.preset "90" (toSource { d | rule = 90 })
                         , Form.preset "110" (toSource { d | rule = 110 })
                         , Form.preset "184" (toSource { d | rule = 184 })
+                        , Form.preset "54" (toSource { d | rule = 54 })
+                        , Form.preset "150" (toSource { d | rule = 150 })
+                        , Form.preset "126" (toSource { d | rule = 126 })
                         ]
                     ]
                 , Form.group "Grid"

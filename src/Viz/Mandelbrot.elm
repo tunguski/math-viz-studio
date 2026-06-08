@@ -207,6 +207,9 @@ controls source =
                         [ Form.preset "Full" (toSource { d | centerX = -0.6, centerY = 0, zoom = 1 })
                         , Form.preset "Seahorse" (toSource { d | centerX = -0.745, centerY = 0.105, zoom = 30 })
                         , Form.preset "Spiral" (toSource { d | centerX = -0.7269, centerY = 0.1889, zoom = 90 })
+                        , Form.preset "Mini-brot" (toSource { d | centerX = -1.749, centerY = 0, zoom = 70 })
+                        , Form.preset "Tendrils" (toSource { d | centerX = -0.235, centerY = 0.827, zoom = 55 })
+                        , Form.preset "Valley" (toSource { d | centerX = -0.16, centerY = 1.035, zoom = 45 })
                         ]
                     ]
                 ]

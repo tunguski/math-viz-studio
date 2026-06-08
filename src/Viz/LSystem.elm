@@ -254,6 +254,9 @@ controls source =
                         , Form.preset "Koch" (toSource koch)
                         , Form.preset "Dragon" (toSource dragon)
                         , Form.preset "Arrowhead" (toSource arrowhead)
+                        , Form.preset "Sierpiński" (toSource sierpinski)
+                        , Form.preset "Gosper" (toSource gosper)
+                        , Form.preset "Bush" (toSource bush)
                         ]
                     ]
                 , Form.hint "Edit the axiom and rules in the Code tab — F/G/A/B draw, +/- turn, [ ] branch."
@@ -301,4 +304,34 @@ arrowhead =
     , angle = 60
     , iterations = 6
     , stroke = "#fbbf24"
+    }
+
+
+sierpinski : Model
+sierpinski =
+    { axiom = "F-G-G"
+    , rules = [ ( "F", "F-G+F+G-F" ), ( "G", "GG" ) ]
+    , angle = 120
+    , iterations = 5
+    , stroke = "#fca5f1"
+    }
+
+
+gosper : Model
+gosper =
+    { axiom = "A"
+    , rules = [ ( "A", "A-B--B+A++AA+B-" ), ( "B", "+A-BB--B-A++A+B" ) ]
+    , angle = 60
+    , iterations = 4
+    , stroke = "#7dd3fc"
+    }
+
+
+bush : Model
+bush =
+    { axiom = "F"
+    , rules = [ ( "F", "FF+[+F-F-F]-[-F+F+F]" ) ]
+    , angle = 22.5
+    , iterations = 4
+    , stroke = "#86efac"
     }

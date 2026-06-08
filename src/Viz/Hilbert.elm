@@ -145,5 +145,14 @@ controls source =
                     [ Form.slider "order" 1 6 1 (toFloat d.order) (\v -> toSource { d | order = round v })
                     , Form.colorRow "stroke" d.stroke (\s -> toSource { d | stroke = s })
                     ]
+                , Form.group "Presets"
+                    [ Form.presets
+                        [ Form.preset "Order 2" (toSource { d | order = 2 })
+                        , Form.preset "Order 3" (toSource { d | order = 3 })
+                        , Form.preset "Order 4" (toSource { d | order = 4 })
+                        , Form.preset "Order 5" (toSource { d | order = 5 })
+                        , Form.preset "Order 6" (toSource { d | order = 6 })
+                        ]
+                    ]
                 , Form.hint "Try the Gradient colour mode — it traces the order of the visit."
                 ]

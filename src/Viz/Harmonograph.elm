@@ -176,9 +176,49 @@ controls source =
                     [ Form.slider "samples" 200 12000 100 (toFloat d.samples) (\v -> toSource { d | samples = round v })
                     , Form.colorRow "stroke" d.stroke (\s -> toSource { d | stroke = s })
                     ]
+                , Form.group "Presets"
+                    [ Form.presets
+                        [ Form.preset "Web" (toSource default)
+                        , Form.preset "Lattice" (toSource lattice)
+                        , Form.preset "Pretzel" (toSource pretzel)
+                        , Form.preset "Star" (toSource star)
+                        , Form.preset "Ribbon" (toSource ribbon)
+                        , Form.preset "Resonant" (toSource resonant)
+                        ]
+                    ]
                 , oscGroup "X oscillators" (\xs -> { d | x = xs }) d.x
                 , oscGroup "Y oscillators" (\ys -> { d | y = ys }) d.y
                 ]
+
+
+osc : Float -> Float -> Float -> Float -> Pendulum
+osc amp freq phase decay =
+    { amp = amp, freq = freq, phase = phase, decay = decay }
+
+
+lattice : Model
+lattice =
+    { x = [ osc 150 5 0 0.003, osc 90 4 1.5708 0.005 ], y = [ osc 150 4 0 0.003, osc 90 5 2.0 0.005 ], samples = 9000, stroke = "#a78bfa" }
+
+
+pretzel : Model
+pretzel =
+    { x = [ osc 160 2 0 0.0035, osc 110 3 0.6 0.006 ], y = [ osc 160 3 0 0.0035, osc 110 2 1.9 0.006 ], samples = 8000, stroke = "#5fd0ff" }
+
+
+star : Model
+star =
+    { x = [ osc 150 5 0 0.0025, osc 100 7 1.0 0.004 ], y = [ osc 150 7 0 0.0025, osc 100 5 2.5 0.004 ], samples = 10000, stroke = "#fbbf24" }
+
+
+ribbon : Model
+ribbon =
+    { x = [ osc 170 1 0 0.0015, osc 60 4 1.5708 0.004 ], y = [ osc 170 1 1.5708 0.0015, osc 60 4 0 0.004 ], samples = 8000, stroke = "#7cfc9b" }
+
+
+resonant : Model
+resonant =
+    { x = [ osc 150 3 0 0.002, osc 120 3.01 1.5708 0.002 ], y = [ osc 150 2 0 0.002, osc 120 2.01 1.0 0.002 ], samples = 11000, stroke = "#ff9cee" }
 
 
 oscGroup : String -> (List Pendulum -> Model) -> List Pendulum -> Html String

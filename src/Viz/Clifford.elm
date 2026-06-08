@@ -149,6 +149,9 @@ controls source =
                         [ Form.preset "Wings" (toSource { d | a = -1.4, b = 1.6, c = 1.0, d = 0.7 })
                         , Form.preset "Ribbon" (toSource { d | a = 1.7, b = 1.7, c = 0.6, d = 1.2 })
                         , Form.preset "Web" (toSource { d | a = -1.7, b = 1.3, c = -0.1, d = -1.2 })
+                        , Form.preset "Feather" (toSource { d | a = -1.8, b = -2.0, c = -0.5, d = -0.9 })
+                        , Form.preset "Swirl" (toSource { d | a = 1.5, b = -1.8, c = 1.6, d = 0.9 })
+                        , Form.preset "Lace" (toSource { d | a = -1.7, b = 1.8, c = -1.9, d = -0.4 })
                         ]
                     ]
                 ]

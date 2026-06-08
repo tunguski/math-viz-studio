@@ -203,4 +203,13 @@ controls source =
                     [ Form.slider "size" 21 161 2 (toFloat d.size) (\v -> toSource { d | size = round v })
                     , Form.colorRow "stroke" d.stroke (\s -> toSource { d | stroke = s })
                     ]
+                , Form.group "Presets"
+                    [ Form.presets
+                        [ Form.preset "Small 51" (toSource { d | size = 51 })
+                        , Form.preset "75" (toSource { d | size = 75 })
+                        , Form.preset "99" (toSource { d | size = 99 })
+                        , Form.preset "125" (toSource { d | size = 125 })
+                        , Form.preset "Large 149" (toSource { d | size = 149 })
+                        ]
+                    ]
                 ]

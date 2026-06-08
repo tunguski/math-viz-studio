@@ -301,6 +301,9 @@ controls source =
                         [ Form.preset "Wheel" (toSource (regraph d wheel))
                         , Form.preset "Prism" (toSource (regraph d prism))
                         , Form.preset "K5" (toSource (regraph d complete))
+                        , Form.preset "Cube" (toSource (regraph d cubeGraph))
+                        , Form.preset "Star" (toSource (regraph d star))
+                        , Form.preset "Bipartite" (toSource (regraph d bipartite))
                         ]
                     ]
                 , Form.hint "Edit nodes and edges directly in the Code tab."
@@ -353,4 +356,42 @@ complete =
         ]
     , iterations = 120
     , stroke = "#ff9cee"
+    }
+
+
+{-| The cube graph Q₃ — eight nodes, twelve edges. -}
+cubeGraph : Model
+cubeGraph =
+    { nodes = [ "0", "1", "2", "3", "4", "5", "6", "7" ]
+    , edges =
+        [ ( 0, 1 ), ( 1, 2 ), ( 2, 3 ), ( 3, 0 )
+        , ( 4, 5 ), ( 5, 6 ), ( 6, 7 ), ( 7, 4 )
+        , ( 0, 4 ), ( 1, 5 ), ( 2, 6 ), ( 3, 7 )
+        ]
+    , iterations = 140
+    , stroke = "#fcd34d"
+    }
+
+
+{-| A star — one hub joined to seven leaves. -}
+star : Model
+star =
+    { nodes = [ "hub", "a", "b", "c", "d", "e", "f", "g" ]
+    , edges = [ ( 0, 1 ), ( 0, 2 ), ( 0, 3 ), ( 0, 4 ), ( 0, 5 ), ( 0, 6 ), ( 0, 7 ) ]
+    , iterations = 120
+    , stroke = "#67e8f9"
+    }
+
+
+{-| The complete bipartite graph K₃,₃ — two groups of three, every cross pair joined. -}
+bipartite : Model
+bipartite =
+    { nodes = [ "a", "b", "c", "x", "y", "z" ]
+    , edges =
+        [ ( 0, 3 ), ( 0, 4 ), ( 0, 5 )
+        , ( 1, 3 ), ( 1, 4 ), ( 1, 5 )
+        , ( 2, 3 ), ( 2, 4 ), ( 2, 5 )
+        ]
+    , iterations = 120
+    , stroke = "#86efac"
     }

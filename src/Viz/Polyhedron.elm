@@ -168,6 +168,8 @@ controls source =
                         [ Form.preset "Cube" (toSource (reshape d cube))
                         , Form.preset "Tetrahedron" (toSource (reshape d tetrahedron))
                         , Form.preset "Octahedron" (toSource (reshape d octahedron))
+                        , Form.preset "Prism" (toSource (reshape d prism))
+                        , Form.preset "Pyramid" (toSource (reshape d pyramid))
                         ]
                     ]
                 , Form.hint "Edit vertices and edges directly in the Code tab."
@@ -241,4 +243,46 @@ octahedron =
     , yaw = 0.7
     , pitch = 0.5
     , stroke = "#7cfc9b"
+    }
+
+
+{-| A triangular prism. -}
+prism : Model
+prism =
+    { vertices =
+        [ { x = -1, y = -0.6, z = 1 }
+        , { x = 1, y = -0.6, z = 1 }
+        , { x = 0, y = 1.1, z = 1 }
+        , { x = -1, y = -0.6, z = -1 }
+        , { x = 1, y = -0.6, z = -1 }
+        , { x = 0, y = 1.1, z = -1 }
+        ]
+    , edges =
+        [ ( 0, 1 ), ( 1, 2 ), ( 2, 0 )
+        , ( 3, 4 ), ( 4, 5 ), ( 5, 3 )
+        , ( 0, 3 ), ( 1, 4 ), ( 2, 5 )
+        ]
+    , yaw = 0.6
+    , pitch = 0.5
+    , stroke = "#fcd34d"
+    }
+
+
+{-| A square pyramid. -}
+pyramid : Model
+pyramid =
+    { vertices =
+        [ { x = 0, y = 1.3, z = 0 }
+        , { x = -1, y = -0.7, z = 1 }
+        , { x = 1, y = -0.7, z = 1 }
+        , { x = 1, y = -0.7, z = -1 }
+        , { x = -1, y = -0.7, z = -1 }
+        ]
+    , edges =
+        [ ( 1, 2 ), ( 2, 3 ), ( 3, 4 ), ( 4, 1 )
+        , ( 0, 1 ), ( 0, 2 ), ( 0, 3 ), ( 0, 4 )
+        ]
+    , yaw = 0.6
+    , pitch = 0.4
+    , stroke = "#a78bfa"
     }
