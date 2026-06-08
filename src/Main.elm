@@ -25,14 +25,24 @@ import MathVizPreview
 import Viz exposing (Viz)
 import Viz.Automaton
 import Viz.Bifurcation
+import Viz.Chladni
+import Viz.Clifford
 import Viz.Graph
 import Viz.Harmonograph
+import Viz.Hilbert
 import Viz.Ifs
 import Viz.Julia
+import Viz.LSystem
 import Viz.Lorenz
+import Viz.Mandelbrot
 import Viz.MaurerRose
+import Viz.Newton
+import Viz.Phyllotaxis
 import Viz.Polyhedron
+import Viz.Rossler
+import Viz.Superformula
 import Viz.TorusKnot
+import Viz.Ulam
 import Viz.VectorField
 
 
@@ -41,13 +51,23 @@ registry : List Viz
 registry =
     [ Viz.Harmonograph.viz
     , Viz.MaurerRose.viz
+    , Viz.Superformula.viz
     , Viz.Ifs.viz
     , Viz.Julia.viz
+    , Viz.Mandelbrot.viz
+    , Viz.Newton.viz
+    , Viz.LSystem.viz
+    , Viz.Hilbert.viz
     , Viz.Polyhedron.viz
     , Viz.TorusKnot.viz
     , Viz.Lorenz.viz
+    , Viz.Rossler.viz
+    , Viz.Clifford.viz
     , Viz.Bifurcation.viz
     , Viz.VectorField.viz
+    , Viz.Phyllotaxis.viz
+    , Viz.Ulam.viz
+    , Viz.Chladni.viz
     , Viz.Graph.viz
     , Viz.Automaton.viz
     ]

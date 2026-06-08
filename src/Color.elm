@@ -1,4 +1,4 @@
-module Color exposing (Coloring(..), resolve, solid, modes, label, timeVarying)
+module Color exposing (Coloring(..), resolve, solid, sample, modes, label, timeVarying)
 
 {-| **Pluggable colour-evolution functions.** A visualisation has a base colour (its `stroke`); a
 `Coloring` decides how that base is turned into the actual colour(s) drawn, possibly varying along the
@@ -107,6 +107,18 @@ solid coloring phase =
 
         Varying f ->
             f 0 phase
+
+
+{-| The colour at a specific position `t ∈ [0, 1]` (for figures drawn as many per-point elements,
+like a phyllotaxis spiral). A `Uniform` coloring ignores `t`. -}
+sample : Coloring -> Float -> Float -> String
+sample coloring t phase =
+    case coloring of
+        Uniform f ->
+            f phase
+
+        Varying f ->
+            f t phase
 
 
 

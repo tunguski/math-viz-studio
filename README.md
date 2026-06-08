@@ -12,9 +12,10 @@ Baseline for what to build toward:
 ## The visualisations
 
 Each kind of mathematics gets its **own** Elm data structure — `scene = { … }` — a different shape
-per visualisation, drawn live into SVG. The kinds span the categories of the Wikipedia article above
-(plane curves, fractals, geometry, chaos theory, complex analysis, linear algebra, topology, graph
-theory, cellular automata):
+per visualisation, drawn live into SVG. The twenty-one kinds span the categories of the Wikipedia
+article above and beyond: plane curves, fractals, geometry, chaos theory, complex analysis, linear
+algebra, topology, graph theory, cellular automata, number theory, wave physics, space-filling
+curves and formal grammars:
 
 | Kind | Mathematics | Model (`scene`) |
 |---|---|---|
@@ -29,6 +30,16 @@ theory, cellular automata):
 | **Vector field** | The phase portrait of a 2×2 linear system (linear algebra) | `{ a, b, c, d, grid, stroke }` |
 | **Force-directed graph** | A network laid out by a spring (Fruchterman–Reingold) simulation | `nodes : List String`, `edges : List (i, j)`, `iterations`, `stroke` |
 | **Cellular automaton** | An elementary Wolfram rule's space-time diagram (rule 30/90/110/…) | `{ rule, width, generations, seed : List Int, stroke }` |
+| **Mandelbrot set** | The most famous fractal — escape-time of `z ↦ z² + c`, panned and zoomed | `{ centerX, centerY, zoom, maxIter, resolution, hue, stroke }` |
+| **Newton fractal** | Newton's-method root basins for `z³ − 1` (complex analysis) | `{ resolution, maxIter, hue, stroke }` |
+| **Rössler attractor** | A chaotic flow — a spiralling sheet with one fold, integrated and spun | `{ a, b, c, dt, steps, yaw, pitch, stroke }` |
+| **Clifford attractor** | A wing-like 2-D strange attractor (a point cloud) | `{ a, b, c, d, points, stroke }` |
+| **L-system** | A rewriting grammar drawn by a turtle (Koch, dragon, plant) | `{ axiom, rules : List (String, String), angle, iterations, stroke }` |
+| **Superformula** | Gielis's polar curve — circles, stars, flowers, blobs from six numbers | `{ m, n1, n2, n3, a, b, stroke }` |
+| **Hilbert curve** | A space-filling curve (one line fills the plane) | `{ order, stroke }` |
+| **Phyllotaxis** | A sunflower's golden-angle seed spiral (per-dot, so gradient paints it) | `{ count, angle, spread, stroke }` |
+| **Ulam spiral** | Primes on a number spiral — they line up on diagonals (number theory) | `{ size, stroke }` |
+| **Chladni figure** | The nodal pattern of a vibrating plate (wave physics) | `{ n, m, resolution, stroke }` |
 
 For example, the harmonograph model is just data:
 
@@ -97,8 +108,9 @@ Shared infrastructure (one place each, reused by every visualisation):
 | `Viz` | **contract** | The plugin record `Viz` (`kind`, `name`, `description`, `starter`, `movable`, `render`, `controls`) and `find`. The model type stays hidden inside each module. |
 
 The visualisations (each `src/Viz/*.elm` is model + decode/print + render + controls behind one `viz`):
-`Viz.Harmonograph`, `Viz.MaurerRose`, `Viz.Ifs`, `Viz.Julia`, `Viz.Polyhedron`, `Viz.TorusKnot`,
-`Viz.Lorenz`, `Viz.Bifurcation`, `Viz.VectorField`, `Viz.Graph`, `Viz.Automaton`.
+`Harmonograph`, `MaurerRose`, `Superformula`, `Ifs`, `Julia`, `Mandelbrot`, `Newton`, `LSystem`,
+`Hilbert`, `Polyhedron`, `TorusKnot`, `Lorenz`, `Rossler`, `Clifford`, `Bifurcation`, `VectorField`,
+`Phyllotaxis`, `Ulam`, `Chladni`, `Graph`, `Automaton`.
 
 The studio shell:
 
