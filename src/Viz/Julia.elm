@@ -34,6 +34,7 @@ viz =
     { kind = "julia"
     , name = "Julia set"
     , description = "Escape-time fractal of z ↦ z² + c — move c and watch it morph."
+    , about = "Around 1918 Gaston Julia and Pierre Fatou asked, for a fixed complex constant c, which starting points stay bounded when iterated under z ↦ z² + c. The boundary between escaping and trapped points is the Julia set, and its shape changes dramatically — disc, dendrite, spiral, dust — as c moves.\n\nThe work was decades ahead of any way to picture it. When computers finally drew these sets in the late 1970s and 80s they became emblems of complex dynamics and chaos, intimately tied to the Mandelbrot set, which charts exactly which c give connected Julia sets."
     , starter = toSource rabbit
     , movable = False
     , render = \source -> Result.map prepare (decode source)

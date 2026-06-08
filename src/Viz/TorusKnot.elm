@@ -30,6 +30,7 @@ viz =
     { kind = "knot"
     , name = "Torus knot"
     , description = "A (p, q) knot wound on a torus — the (2, 3) is a trefoil."
+    , about = "A torus knot winds around a doughnut's tube p times while looping q times through its hole; when p and q share no common factor the result is a genuine knot. The simplest, the (2, 3) knot, is the trefoil — the most basic knot that cannot be untangled into a plain loop.\n\nKnot theory — classifying how a closed loop can be tangled in space — grew from Lord Kelvin's 1860s idea that atoms were knotted vortices. The atomic theory was wrong, but the mathematics flourished and is now central to topology, with surprising applications to DNA, polymers and quantum field theory."
     , starter = toSource default
     , movable = True
     , render = \source -> Result.map prepare (decode source)

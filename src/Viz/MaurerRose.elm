@@ -26,6 +26,7 @@ viz =
     { kind = "rose"
     , name = "Maurer rose"
     , description = "Chords around a rose curve weave a lattice."
+    , about = "Rose curves r = sin(n·θ) — smooth flowers of petals — go back to the 18th-century mathematician Guido Grandi. In 1987 Peter Maurer noticed something new: instead of drawing the curve continuously, connect the points found at θ = 0°, d°, 2d°, … with straight chords.\n\nWhen the step d is chosen well those chords criss-cross into a startlingly intricate lattice over the petals. A \"Maurer rose\" is fixed by just two integers, n and d, yet turns a simple flower into a woven geometric tapestry — a small marvel of how sampling can create structure."
     , starter = toSource default
     , movable = False
     , render = \source -> Result.map prepare (decode source)

@@ -30,6 +30,7 @@ viz =
     { kind = "lorenz"
     , name = "Lorenz attractor"
     , description = "A strange attractor — the chaotic butterfly flow."
+    , about = "In 1963 the meteorologist Edward Lorenz reduced atmospheric convection to three simple equations. Restarting a run from a rounded-off number, he watched the forecast diverge completely — the origin of the \"butterfly effect\", the idea that tiny causes can have huge, unpredictable consequences.\n\nThe trajectory never repeats, yet it is forever drawn to a bounded, two-lobed shape — a \"strange attractor\", fittingly butterfly-like. Lorenz's system launched modern chaos theory and proved that perfectly deterministic equations can still be impossible to predict in the long run."
     , starter = toSource default
     , movable = True
     , render = \source -> Result.map prepare (decode source)

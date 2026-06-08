@@ -30,6 +30,7 @@ viz =
     { kind = "lsystem"
     , name = "L-system"
     , description = "A rewriting grammar drawn by a turtle — snowflakes, dragons, plants."
+    , about = "The biologist Aristid Lindenmayer invented L-systems in 1968 to model how plants grow. You start with a short string, rewrite every symbol simultaneously by fixed production rules, repeat, then read the long result as turtle-graphics commands: draw, turn, push and pop a branch.\n\nThis tiny grammar captures both botanical growth and classic fractals — the Koch snowflake, the dragon curve, branching trees and ferns — all from a few rules. L-systems remain a foundation of procedural plant modelling in computer graphics, where they grow forests one rule at a time."
     , starter = toSource plant
     , movable = False
     , render = \source -> Result.map prepare (decode source)

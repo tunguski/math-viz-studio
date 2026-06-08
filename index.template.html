@@ -77,6 +77,26 @@
       .mv-card:hover { border-color: #4f8bff; transform: translateY(-1px); }
       .mv-card-title { font-size: 15px; font-weight: 700; color: #e6edf3; }
       .mv-card-desc { font-size: 12.5px; color: #8aa0b2; }
+
+      /* ---- Info overlay (covers the whole editor, closeable) ---- */
+      .mv-info { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center;
+                 background: rgba(4,7,14,0.72); padding: 24px; }
+      .mv-info-card { position: relative; width: min(680px, 94vw); max-height: 88vh; overflow: auto;
+                      background: #0e1726; border: 1px solid #25344f; border-radius: 16px;
+                      padding: 26px 30px; box-shadow: 0 20px 70px rgba(0,0,0,0.6); }
+      .mv-info-close { position: absolute; top: 14px; right: 16px; width: 30px; height: 30px;
+                       border-radius: 8px; border: 1px solid #2a3550; background: #161f38;
+                       color: #e6edf3; font-size: 15px; cursor: pointer; }
+      .mv-info-close:hover { border-color: #ff6b6b; color: #ff9c9c; }
+      .mv-info-title { font-size: 22px; font-weight: 800; color: #e6edf3; margin-bottom: 16px;
+                       padding-right: 36px; }
+      .mv-info-sample { height: 280px; border: 1px solid #20304d; border-radius: 12px;
+                        background: radial-gradient(circle at 50% 40%, #11203c 0%, #070b14 72%);
+                        overflow: hidden; margin-bottom: 18px; }
+      .mv-info-sample svg { width: 100%; height: 100%; display: block;
+                            filter: drop-shadow(0 0 4px rgba(120,200,255,0.35)); }
+      .mv-info-body { display: flex; flex-direction: column; gap: 12px; }
+      .mv-info-p { font-size: 14px; line-height: 1.65; color: #b6c4d6; }
     </style>
   </head>
   <body>

@@ -38,6 +38,7 @@ type alias Model =
     , colorMode : String
     , phase : Float
     , animate : Bool
+    , showInfo : Bool
     }
 
 
@@ -45,13 +46,14 @@ type Msg
     = Tick Float
     | ToggleAnimate
     | NextColor
+    | ToggleInfo
     | Copy String
 
 
 {-| The pluggable preview, parameterised by the visualisation registry. -}
 spec : List Viz -> Preview.Spec Model Msg
 spec registry =
-    { init = \ctx -> ( reparse registry ctx { current = Nothing, draw = Nothing, error = Nothing, colorMode = "fixed", phase = 0, animate = False }, Cmd.none )
+    { init = \ctx -> ( reparse registry ctx { current = Nothing, draw = Nothing, error = Nothing, colorMode = "fixed", phase = 0, animate = False, showInfo = False }, Cmd.none )
     , sourcesChanged = \ctx model -> ( reparse registry ctx model, Cmd.none )
     , update = update
     , subscriptions = subscriptions
@@ -108,6 +110,9 @@ update _ msg model =
         NextColor ->
             ( { model | colorMode = nextMode model.colorMode }, Cmd.none )
 
+        ToggleInfo ->
+            ( { model | showInfo = not model.showInfo }, Cmd.none )
+
         Copy source ->
             ( model, copyToClipboard source )
 
@@ -150,15 +155,52 @@ subscriptions _ model =
 view : Context -> Model -> Html Msg
 view ctx model =
     div [ class "mv-pane" ]
-        [ toolbar ctx model
-        , case model.error of
+        ([ toolbar ctx model
+         , case model.error of
             Just e ->
                 div [ class "mv-error" ] [ text ("Cannot render — " ++ e ++ "  (fix it in the Code tab)") ]
 
             Nothing ->
                 text ""
-        , div [ class "mv-stage" ] [ picture model ]
+         , div [ class "mv-stage" ] [ picture model ]
+         ]
+            ++ (case ( model.showInfo, model.current ) of
+                    ( True, Just v ) ->
+                        [ infoOverlay v ]
+
+                    _ ->
+                        []
+               )
+        )
+
+
+{-| A full-window, closeable overlay explaining the current structure, with a static sample rendered
+from its starter (fixed colour, no animation). Positioned `fixed` (see editor.css overlay) so it
+covers the whole editor, not just the result pane. -}
+infoOverlay : Viz -> Html Msg
+infoOverlay v =
+    div [ class "mv-info" ]
+        [ div [ class "mv-info-card" ]
+            [ button [ class "mv-info-close", onClick ToggleInfo, title "Close" ] [ text "✕" ]
+            , div [ class "mv-info-title" ] [ text v.name ]
+            , div [ class "mv-info-sample" ] [ infoSample v ]
+            , div [ class "mv-info-body" ]
+                (List.map (\para -> div [ class "mv-info-p" ] [ text para ])
+                    (List.filter (\p -> p /= "") (String.split "\n\n" v.about))
+                )
+            ]
         ]
+
+
+{-| The canonical sample picture: the visualisation's starter, fixed colour, phase 0. -}
+infoSample : Viz -> Html Msg
+infoSample v =
+    case v.render v.starter of
+        Ok drawer ->
+            Html.map never (drawer "fixed" 0)
+
+        Err _ ->
+            text ""
 
 
 {-| Draw the cached drawer at the current colour mode and phase — the whole per-frame cost. -}
@@ -200,6 +242,9 @@ toolbar ctx model =
                     "▶ Animate"
                 )
             ]
+        , button
+            [ class "mv-btn", onClick ToggleInfo, title "About this structure — its history and importance" ]
+            [ text "? Info" ]
         , button
             [ class "mv-btn", onClick (Copy (currentSource ctx)), title "Copy the model's Elm source" ]
             [ text "⧉ Copy model" ]

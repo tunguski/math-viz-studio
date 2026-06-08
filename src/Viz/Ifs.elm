@@ -31,6 +31,7 @@ viz =
     { kind = "ifs"
     , name = "Iterated function system"
     , description = "A chaos-game fractal, like the Barnsley fern."
+    , about = "An iterated function system builds a fractal from just a handful of contracting affine maps. Their unique attractor can be painted by the \"chaos game\": start anywhere, then repeatedly jump by a randomly chosen map — the orbit settles onto the fractal.\n\nMichael Barnsley championed IFS in the 1980s and showed that lifelike images, most famously a fern leaf, compress to only four such maps. It is a striking lesson in self-similarity and data compression: infinite, intricate detail encoded in a few dozen numbers."
     , starter = toSource fern
     , movable = False
     , render = \source -> Result.map prepare (decode source)

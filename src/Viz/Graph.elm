@@ -28,6 +28,7 @@ viz =
     { kind = "graph"
     , name = "Force-directed graph"
     , description = "A network laid out by a spring simulation."
+    , about = "A graph — nodes joined by edges — is one of mathematics' most universal structures. The subject began in 1736 when Euler proved you cannot cross all seven bridges of Königsberg exactly once, and it now underpins everything from road maps and circuits to social and neural networks.\n\nA graph has no fixed shape, so drawing one well is its own problem. A force-directed layout (the Fruchterman–Reingold algorithm, 1991) treats edges as springs pulling nodes together and all nodes as charges pushing apart, then lets the system relax — so a balanced, symmetric picture emerges from simulated physics rather than being placed by hand."
     , starter = toSource wheel
     , movable = False
     , render = \source -> Result.map prepare (decode source)

@@ -29,6 +29,7 @@ viz =
     { kind = "newton"
     , name = "Newton fractal"
     , description = "Newton's method basins for z³ − 1 — three colours, a fractal border."
+    , about = "Newton's method is the workhorse root-finder of numerical analysis: guess, then repeatedly slide along the tangent to a better guess. For a complex polynomial like z³ − 1 there are several roots, and every starting point eventually falls toward one of them.\n\nColouring the plane by which root each point reaches divides it into \"basins of attraction\". Astonishingly, the borders between the three basins are not smooth but fractal — and wherever two basins meet, the third is squeezed in too. It is a beautiful, unsettling picture of how a familiar algorithm hides chaos at its boundaries."
     , starter = toSource default
     , movable = False
     , render = \source -> Result.map prepare (decode source)

@@ -26,6 +26,7 @@ viz =
     { kind = "ulam"
     , name = "Ulam spiral"
     , description = "Primes on a number spiral — they line up on diagonals."
+    , about = "Bored during a talk in 1963, Stanisław Ulam idly wrote the whole numbers 1, 2, 3, … in a square spiral and circled the primes. To his surprise they were not scattered at random — many fell along diagonal lines.\n\nThose diagonals correspond to prime-rich quadratic polynomials, such as Euler's famous n² + n + 41, which yields primes for forty straight values of n. The Ulam spiral makes visible a faint, still-mysterious order in the distribution of the primes, and helped popularise computer experiments in number theory."
     , starter = toSource default
     , movable = False
     , render = \source -> Result.map prepare (decode source)

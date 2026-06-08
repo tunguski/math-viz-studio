@@ -29,6 +29,7 @@ viz =
     { kind = "clifford"
     , name = "Clifford attractor"
     , description = "A delicate, wing-like strange attractor from a 2-D map."
+    , about = "This is one of the \"strange attractors\" popularised by Clifford Pickover in the 1980s and 90s. Iterating the two-line map x′ = sin(a·y) + c·cos(a·x), y′ = sin(b·x) + d·cos(b·y) sends a point wandering forever without ever repeating, yet it stays confined to an intricate, wing-like cloud.\n\nWith only four numbers it produces an endless gallery of filaments and folds — a vivid reminder that elaborate structure can emerge from a trivially short recurrence, and a favourite of generative artists."
     , starter = toSource default
     , movable = False
     , render = \source -> Result.map prepare (decode source)

@@ -33,6 +33,7 @@ viz =
     { kind = "mandelbrot"
     , name = "Mandelbrot set"
     , description = "The most famous fractal — pan and zoom into z ↦ z² + c."
+    , about = "The Mandelbrot set records, for every complex number c, whether the iteration z ↦ z² + c stays bounded starting from z = 0. It is in effect an atlas of all Julia sets: the c inside the set are exactly those whose Julia set is connected.\n\nBenoit Mandelbrot — who coined the word \"fractal\" — brought it to the world in 1980. Its boundary is infinitely intricate and endlessly self-similar, with tiny copies of the whole buried at every scale. It became the public face of fractal geometry and is often called the most famous object in modern mathematics."
     , starter = toSource default
     , movable = False
     , render = \source -> Result.map prepare (decode source)

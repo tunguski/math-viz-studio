@@ -31,6 +31,7 @@ viz =
     { kind = "rossler"
     , name = "Rössler attractor"
     , description = "A chaotic flow — a spiralling sheet with a single fold."
+    , about = "Otto Rössler designed his attractor in 1976 deliberately as the simplest possible chaotic flow — three equations with a single quadratic nonlinearity. A point spirals outward on a nearly flat sheet, then the lone fold lifts and folds it back to the centre, over and over.\n\nThat stretch-and-fold is the essence of chaos, and because Rössler's system is so spare it became a standard textbook companion to the Lorenz attractor for showing how deterministic equations produce unpredictable, never-repeating motion."
     , starter = toSource default
     , movable = True
     , render = \source -> Result.map prepare (decode source)

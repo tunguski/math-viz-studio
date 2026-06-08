@@ -29,6 +29,7 @@ viz =
     { kind = "bifurcation"
     , name = "Bifurcation diagram"
     , description = "The logistic map's period-doubling route to chaos."
+    , about = "The logistic map x ↦ r·x·(1−x) is a one-line model of population growth. Plotting the values an orbit eventually settles into, as the growth rate r increases, gives the bifurcation diagram: a single value splits into two, then four, then eight, faster and faster, before dissolving into chaos — with narrow windows of order reappearing inside it.\n\nIn the 1970s Mitchell Feigenbaum discovered that the period-doublings shrink by a universal constant (≈ 4.669…) found in countless unrelated systems, from dripping taps to electronics. It was decisive evidence that the route to chaos has a deep, shared mathematical structure."
     , starter = toSource default
     , movable = False
     , render = \source -> Result.map prepare (decode source)

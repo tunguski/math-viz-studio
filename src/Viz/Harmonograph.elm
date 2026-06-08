@@ -35,6 +35,7 @@ viz =
     { kind = "harmonograph"
     , name = "Harmonograph"
     , description = "Sums of damped sinusoids — looping plane curves."
+    , about = "A harmonograph is a Victorian drawing machine: a pen and the paper beneath it hang from separate pendulums, and as they swing and slowly die away the pen traces the sum of decaying sine waves. They were a staple of 19th-century science lectures and parlours.\n\nThe looping figures make the mathematics of coupled oscillation visible — when the pendulums' frequencies are simple ratios the curve closes into a stable knot, and slight detunings make it precess. It is the same physics of beats and resonance that underlies musical harmony and the Lissajous figures seen on an oscilloscope."
     , starter = toSource default
     , movable = True
     , render = \source -> Result.map prepare (decode source)

@@ -29,6 +29,7 @@ viz =
     { kind = "phyllotaxis"
     , name = "Phyllotaxis"
     , description = "A sunflower's golden-angle seed spiral."
+    , about = "Look closely at a sunflower head, a pinecone or a pineapple and you see interlocking spirals, their counts almost always consecutive Fibonacci numbers. The secret is the angle between successive florets: the \"golden angle\" of about 137.5°, the most irrational turn there is, which packs new seeds into the gaps most evenly.\n\nHelmut Vogel captured this in 1979 with a simple model — the n-th seed sits at radius √n and angle n × 137.5°. Phyllotaxis is a celebrated meeting point of botany, the Fibonacci sequence and the golden ratio: nudge the angle a fraction of a degree and the elegant packing falls apart."
     , starter = toSource default
     , movable = False
     , render = \source -> Result.map prepare (decode source)

@@ -30,6 +30,7 @@ viz =
     { kind = "superformula"
     , name = "Superformula"
     , description = "Gielis's formula — circles, stars, flowers and blobs from six numbers."
+    , about = "In 2003 the botanist Johan Gielis published a single polar equation — the \"superformula\" — that generalises the circle, ellipse, square and regular polygon. By tuning six numbers it sweeps continuously through stars, flowers, gears, teardrops and organic blobs.\n\nGielis argued that many shapes in nature — diatoms, starfish, flowers, cross-sections of stems — are well fit by it, and proposed it as a kind of unifying \"shape descriptor\". The claim of universality is debated, but as a compact generator of striking forms the superformula has become a favourite in design and generative art."
     , starter = toSource default
     , movable = False
     , render = \source -> Result.map prepare (decode source)

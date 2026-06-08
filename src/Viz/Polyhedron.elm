@@ -29,6 +29,7 @@ viz =
     { kind = "polyhedron"
     , name = "Polyhedron"
     , description = "A rotating wireframe solid you can spin."
+    , about = "Polyhedra — solids bounded by flat faces — are among the oldest objects of study in geometry. The five regular \"Platonic solids\" were known to the ancient Greeks; Plato tied them to the classical elements, and they appear as the climax of Euclid's Elements.\n\nEuler's formula V − E + F = 2 binds their vertices, edges and faces and helped launch topology. Drawing a rotating wireframe by projecting its vertices to the plane is the oldest move in mathematical visualisation — the art of conveying three dimensions on a flat surface."
     , starter = toSource cube
     , movable = True
     , render = \source -> Result.map (\m -> \mode phase -> view (Color.solid (Color.resolve mode m.stroke) phase) phase m) (decode source)

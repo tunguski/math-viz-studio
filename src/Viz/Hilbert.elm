@@ -25,6 +25,7 @@ viz =
     { kind = "hilbert"
     , name = "Hilbert curve"
     , description = "A space-filling curve — one line that fills the plane."
+    , about = "In 1891 David Hilbert described a single continuous curve that, taken to its limit, passes through every point of a square. Such \"space-filling\" curves had shocked mathematicians a few years earlier (Peano found the first in 1890): a one-dimensional line that fills two-dimensional area defies naïve intuition about dimension.\n\nHilbert's version has a prized property — points close together along the curve stay close together in the plane. That locality makes it genuinely useful today, for laying out images in memory, indexing spatial databases, and ordering data so nearby items are stored nearby."
     , starter = toSource default
     , movable = False
     , render = \source -> Result.map prepare (decode source)

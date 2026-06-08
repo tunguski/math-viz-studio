@@ -31,6 +31,7 @@ viz =
     { kind = "field"
     , name = "Vector field"
     , description = "The phase portrait of a 2×2 linear system."
+    , about = "A linear system of differential equations (x, y)′ = A·(x, y) sends every point drifting along an arrow; together the arrows form a \"phase portrait\". Remarkably, its entire character is fixed by the eigenvalues of the 2×2 matrix A — real eigenvalues give nodes and saddles, complex ones give spirals, and pure-imaginary ones give closed orbits around a centre.\n\nThis qualitative, geometric way of understanding equations — reading behaviour off the picture rather than solving formulas — was pioneered by Henri Poincaré in the 1880s and is the foundation of the modern theory of dynamical systems."
     , starter = toSource spiral
     , movable = False
     , render = \source -> Result.map prepare (decode source)

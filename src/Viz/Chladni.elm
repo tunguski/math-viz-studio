@@ -27,6 +27,7 @@ viz : Viz
 viz =
     { kind = "chladni"
     , name = "Chladni figure"
+    , about = "In the 1780s Ernst Chladni drew a violin bow across the edge of a metal plate sprinkled with fine sand. The sand danced away from the moving regions and gathered along the lines that stayed perfectly still — the nodal lines of the plate's vibration modes — tracing delicate, symmetric figures that depend on the frequency.\n\nThese \"Chladni figures\" made sound visible for the first time and helped found the study of vibrating surfaces. The same nodal patterns govern drumheads, loudspeaker cones and even the resonances of musical instruments; here they come from the zero set of a simple standing-wave function on a square."
     , description = "Where a vibrating plate stands still — the sand-pattern nodes."
     , starter = toSource default
     , movable = False

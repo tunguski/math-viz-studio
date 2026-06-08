@@ -10,6 +10,8 @@ the registry is uniform even though each visualisation has a different model typ
 
   - `kind` — the discriminator matching the scene's `kind = "…"` field; the registry dispatches on it.
   - `name` / `description` — shown on the gallery card.
+  - `about` — a couple of paragraphs on the structure's history and importance, shown in the info
+    overlay (paragraphs separated by a blank line) alongside a static sample rendered from `starter`.
   - `starter` — the source the gallery card switches to.
   - `movable` — whether the visualisation uses the animation clock (so the preview only ticks for
     the kinds that actually move).
@@ -41,6 +43,7 @@ type alias Viz =
     { kind : String
     , name : String
     , description : String
+    , about : String
     , starter : String
     , movable : Bool
     , render : String -> Result String Drawer

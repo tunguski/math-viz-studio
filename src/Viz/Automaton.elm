@@ -30,6 +30,7 @@ viz =
     { kind = "automaton"
     , name = "Cellular automaton"
     , description = "An elementary Wolfram rule, drawn row by row."
+    , about = "A cellular automaton updates a row of cells in lock-step by a fixed local rule — each cell's next state depends only on itself and its two neighbours. With two states and a 3-cell neighbourhood there are exactly 256 such \"elementary\" rules.\n\nStephen Wolfram catalogued them in the 1980s and found astonishing variety: Rule 90 draws the Sierpiński triangle, Rule 30 produces a stream so random it was once used as a generator, and Rule 110 is Turing-complete — able, in principle, to compute anything. They are a minimal demonstration that very simple rules can generate unbounded complexity."
     , starter = toSource default
     , movable = False
     , render = \source -> Result.map prepare (decode source)
