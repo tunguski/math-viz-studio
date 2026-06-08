@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<!-- data-theme=dark applies the editor shell's dark theme so the chrome matches the elm-lang editor. -->
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MathViz Studio</title>
+    <!-- The reusable editor shell's chrome (file pane, code editing, resizable panes, …). -->
+    <link rel="stylesheet" href="editor.css" />
+    <style>
+      html, body { margin: 0; height: 100%; }
+      #app { height: 100%; }
+
+      /* Elm token colours not already covered by editor.css (which styles com/kw/str/num/op/type). */
+      .seg-var  { color: #cdd9e5; }
+      .seg-val  { color: #82aaff; }
+      .seg-prop { color: #80cbc4; }
+      .seg-sel  { color: #f0c674; }
+      .ce-seg-var  { color: #cdd9e5; }
+      .ce-seg-val  { color: #82aaff; }
+      .ce-seg-prop { color: #80cbc4; }
+      .ce-seg-sel  { color: #f0c674; }
+
+      /* ---- MathViz Studio result pane ---- */
+      .mv-pane { display: flex; flex-direction: column; height: 100%; min-height: 0; gap: 10px; }
+      .mv-toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+      .mv-tag { font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: #8aa0b2;
+                margin-right: auto; }
+      .mv-btn { font: inherit; font-size: 13px; color: #e6edf3; background: #161f38;
+                border: 1px solid #2a3550; border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+      .mv-btn:hover { border-color: #4f8bff; }
+      .mv-btn.active { background: #21407e; border-color: #4f8bff; }
+      .mv-stage { flex: 1; min-height: 0; border: 1px solid #20304d; border-radius: 14px;
+                  background: radial-gradient(circle at 50% 38%, #11203c 0%, #070b14 72%);
+                  box-shadow: inset 0 0 70px rgba(0,0,0,0.55); overflow: hidden; }
+      .mv-stage svg { width: 100%; height: 100%; display: block;
+                      filter: drop-shadow(0 0 4px rgba(120,200,255,0.35)); }
+      .mv-empty { display: grid; place-items: center; height: 100%; color: #51607a; font-size: 14px; }
+      .mv-error { color: #ffc0c8; background: #2a151b; border: 1px solid #5a2531; border-radius: 8px;
+                  padding: 8px 12px; font-size: 12.5px; }
+
+      /* ---- Build panel (the structured controls in the code pane) ---- */
+      .mv-controls { display: flex; flex-direction: column; gap: 18px; padding: 4px 2px 16px; }
+      .mv-group { display: flex; flex-direction: column; gap: 10px; }
+      .mv-group-title { font: 700 11px ui-monospace, monospace; letter-spacing: 0.08em;
+                        text-transform: uppercase; color: #80cbc4; padding-bottom: 4px;
+                        border-bottom: 1px solid #1b2535; }
+      .mv-subhead { font-size: 11px; color: #6b7d92; margin-top: 4px; }
+      .mv-ctrl { display: flex; flex-direction: column; gap: 5px; }
+      .mv-ctrl-inline { flex-direction: row; align-items: center; justify-content: space-between; }
+      .mv-ctrl-head { display: flex; justify-content: space-between; font-size: 12.5px; }
+      .mv-ctrl-label { color: #9fb3c8; }
+      .mv-ctrl-val { color: #e6edf3; font-family: ui-monospace, monospace; }
+      .mv-ctrl input[type=range] { width: 100%; accent-color: #4f8bff; }
+      .mv-color { width: 46px; height: 28px; padding: 0; border: 1px solid #2a3550; border-radius: 6px;
+                  background: #0b1118; cursor: pointer; }
+
+      .mv-presets { display: flex; flex-wrap: wrap; gap: 8px; }
+      .mv-preset { font: inherit; font-size: 12.5px; color: #cdd9e5; background: #0f1a2e;
+                   border: 1px solid #2a3550; border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+      .mv-preset:hover { border-color: #4f8bff; color: #fff; }
+      .mv-hint { font-size: 11.5px; color: #6b7d92; }
+
+      .mv-table { display: flex; flex-direction: column; gap: 4px; }
+      .mv-trow { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+      .mv-thead .mv-th { font: 600 11px ui-monospace, monospace; color: #6b7d92; text-align: center; }
+      .mv-num { width: 100%; box-sizing: border-box; font-family: ui-monospace, monospace;
+                font-size: 12px; padding: 4px 5px; background: #0b1118; color: #e6edf3;
+                border: 1px solid #2a3550; border-radius: 5px; }
+      .mv-num:focus { outline: none; border-color: #4f8bff; }
+
+      /* ---- Gallery panel ---- */
+      .mv-gallery { display: flex; flex-direction: column; gap: 12px; padding: 6px 2px; }
+      .mv-card { display: flex; flex-direction: column; gap: 6px; text-align: left; cursor: pointer;
+                 background: linear-gradient(135deg, #14233f, #0d1626); border: 1px solid #25344f;
+                 border-radius: 12px; padding: 16px 18px; color: inherit; }
+      .mv-card:hover { border-color: #4f8bff; transform: translateY(-1px); }
+      .mv-card-title { font-size: 15px; font-weight: 700; color: #e6edf3; }
+      .mv-card-desc { font-size: 12.5px; color: #8aa0b2; }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script src="app.js"></script>
+    <script>
+      // The compiled elm-lang app auto-mounts on #app and exposes its ports on window.$app. It may
+      // mount a tick after this script runs, so poll briefly until the ports exist, then wire the
+      // one outgoing port (copy the model source to the clipboard).
+      (function wire() {
+        if (!window.$app || !window.$app.ports) { setTimeout(wire, 30); return; }
+        var p = window.$app.ports;
+        if (p.copyToClipboard) {
+          p.copyToClipboard.subscribe(function (txt) {
+            if (navigator.clipboard) { navigator.clipboard.writeText(txt).catch(function () {}); }
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>

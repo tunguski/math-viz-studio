@@ -1,0 +1,6 @@
+# Normalize line endings to LF in the repository for text files (so build.sh runs on CI runners
+# regardless of a contributor's autocrlf setting).
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.ico binary

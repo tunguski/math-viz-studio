@@ -1,0 +1,75 @@
+name: Deploy to GitHub Pages
+
+# Builds MathViz Studio and publishes build/ to
+# https://tunguski.github.io/math-viz-studio/.
+#
+# The app is compiled and served entirely by the elm-lang CLI (built from the tunguski/elm-lang repo
+# as a runnable elm.jar) and reuses the editor shell modules vendored from tunguski/elm-editor — so
+# CI checks out both sibling repos, builds the compiler, then runs the project's own build.sh
+# (which calls `elm make`). No Node / npx is involved.
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment; newer pushes cancel an in-flight build.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out this project
+        uses: actions/checkout@v4
+
+      # The elm-lang CLI (the compiler) and the elm-editor checkout (this app vendors its shell
+      # modules) live in sibling tunguski repos.
+      - name: Check out elm-lang (compiler) and elm-editor (vendored shell)
+        run: |
+          git clone --depth 1 --branch master https://github.com/tunguski/elm-lang.git   elm-lang
+          git clone --depth 1 --branch master https://github.com/tunguski/elm-editor.git elm-editor
+
+      - name: Set up GraalVM for JDK 25
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '25'
+          distribution: 'graalvm'
+          cache: 'maven'
+
+      - name: Build the elm-lang CLI (elm.jar)
+        working-directory: elm-lang
+        run: |
+          chmod +x ./mvnw
+          ./mvnw -B -ntp clean package -DskipTests
+
+      - name: Build MathViz Studio
+        env:
+          ELM: java -jar ${{ github.workspace }}/elm-lang/target/elm.jar
+          EDITOR: ${{ github.workspace }}/elm-editor
+        run: |
+          chmod +x ./build.sh
+          ./build.sh
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
