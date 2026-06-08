@@ -56,18 +56,43 @@ The code pane offers three tabs, all editing the same `scene` file:
 The result pane plays/pauses an animation (the curve precesses, the solid spins) and copies the model
 source.
 
-## How it fits together
+## How it fits together — a registry of self-contained visualisations
+
+The studio is configured by **one list** in `Main` — the registry. Each entry is a self-contained
+module under `Viz/` that bundles a visualisation's *model, data, logic and visualisation* and exposes
+a single `Viz` value. The preview, the Build controls and the Gallery all read the registry, so the
+hosting modules never mention a specific visualisation.
+
+Shared infrastructure (one place each, reused by every visualisation):
+
+| Module | Layer | Role |
+|---|---|---|
+| `Value` | **data** | Reads the `scene = { … }` Elm value out of the source (`parseScene`, decode accessors) and prints values back (`header`, `renderList`, `numStr`). The model is just data — no interpreter. |
+| `Draw` | **visualisation** | SVG primitives — the shared `stage`, coordinate rounding, `fitTransform`, and the 3-D `project`/`rotate2`/`centroid`. |
+| `Form` | **controls** | The Build-panel widgets (`slider`, `colorRow`, `numCell`, `preset`, …); each returns `Html String` whose message *is* the new scene source. |
+| `Viz` | **contract** | The plugin record `Viz` (`kind`, `name`, `description`, `starter`, `movable`, `render`, `controls`) and `find`. The model type stays hidden inside each module. |
+
+The visualisations (each `src/Viz/*.elm` is model + decode/print + render + controls behind one `viz`):
+`Viz.Harmonograph`, `Viz.Ifs`, `Viz.Polyhedron`, `Viz.Lorenz`, `Viz.Graph`, `Viz.Automaton`.
+
+The studio shell:
 
 | Module | Role |
 |---|---|
-| `Scene` | The three model data structures, a small reader of the Elm *value* sublanguage (`parse`), and a pretty-printer back to Elm source (`toSource`). The hinge every view round-trips through. |
-| `Render` | `Scene → Svg` — samples the harmonograph, runs the chaos game, projects the polyhedron. |
-| `MathVizPreview` | The `Preview.Spec` plugged into the shell: parse the file, render it, drive the animation clock, surface parse errors. |
-| `Controls` | The **Build** and **Gallery** panels — pure views that emit a new source string the shell folds back into the file. |
-| `Main` | Wires the shell: `Editor.program { preview = MathVizPreview.spec, panels = [Build, Gallery], … }`. |
+| `MathVizPreview` | The `Preview.Spec`: reads the scene's `kind`, finds the matching `Viz` in the registry, renders it, drives the animation clock, surfaces parse errors. Registry-driven — unchanged when you add a visualisation. |
+| `Controls` | The **Build** and **Gallery** panels — dispatch to the current `Viz`'s controls, and one gallery card per registry entry. Also registry-driven. |
+| `Main` | Holds the `registry : List Viz` and wires the shell. |
 
-There is no interpreter here — the model is *data*, not a program — so `Scene.parse` reads just
-records, lists, tuples, numbers and strings, and the studio stays small.
+### Add your own visualisation
+
+1. Write `src/Viz/MyThing.elm` exposing `viz : Viz` — copy the smallest existing one
+   ([`Viz/Lorenz.elm`](src/Viz/Lorenz.elm) is a good template). Define your `Model`, a `decode`
+   (using `Value`), a `toSource`, a `view : … -> Svg msg` (using `Draw`), and `controls` (using
+   `Form`). Give it a unique `kind` string.
+2. Add `Viz.MyThing.viz` to `registry` in [`Main.elm`](src/Main.elm).
+
+That is the whole wiring — your visualisation now has a result pane, a Build form and a Gallery card.
+A user shipping their *own* set just edits that one list.
 
 ## Build & run
 

@@ -1,14 +1,19 @@
 module Main exposing (main)
 
 {-| MathViz Studio — a visual builder for mathematical visualisations, built on the reusable `Editor`
-shell.
+shell and a **registry** of visualisations.
 
-You pick a visualisation in the **Gallery**, shape it with sliders in **Build**, or edit it as plain
-Elm in **Code** — the three are views of one file. That file *is* the mathematical model: a single
-`scene = { … }` Elm data structure, a different shape for each kind of visualisation (a harmonograph,
-an iterated function system, a polyhedron). The shell supplies all the IDE chrome (editing,
-resizable panes, sharing, autosave); this module just wires in the SVG result pane
-(`MathVizPreview`), the builder panels (`Controls`) and the opening scene.
+The whole studio is configured by one list — `registry` below. Each entry is a self-contained
+visualisation module (under `Viz/`) that bundles its model, its decode/print, its SVG render and its
+controls behind a single `Viz` value. To add your own visualisation:
+
+ 1. write `src/Viz/MyThing.elm` exposing `viz : Viz` (copy any existing one as a template), and
+ 2. add `Viz.MyThing.viz` to `registry`.
+
+That is the only wiring — the preview, the Build controls and the Gallery all read the registry, so a
+new visualisation gets its result pane, its form and its gallery card for free. The file the user
+edits *is* the mathematical model: a single `scene = { … }` Elm data structure, a different shape per
+visualisation.
 
 Baseline of what to build toward: <https://en.wikipedia.org/wiki/Mathematical_visualization>.
 -}
@@ -17,15 +22,33 @@ import Controls
 import Editor
 import Highlight
 import MathVizPreview
-import Scene
+import Viz exposing (Viz)
+import Viz.Automaton
+import Viz.Graph
+import Viz.Harmonograph
+import Viz.Ifs
+import Viz.Lorenz
+import Viz.Polyhedron
+
+
+{-| The configured set of visualisations. Append your own `Viz` here. -}
+registry : List Viz
+registry =
+    [ Viz.Harmonograph.viz
+    , Viz.Ifs.viz
+    , Viz.Polyhedron.viz
+    , Viz.Lorenz.viz
+    , Viz.Graph.viz
+    , Viz.Automaton.viz
+    ]
 
 
 main : Program () (Editor.Model MathVizPreview.Model MathVizPreview.Msg) (Editor.Msg MathVizPreview.Msg)
 main =
     Editor.program
-        { preview = MathVizPreview.spec
+        { preview = MathVizPreview.spec registry
         , intel = elmIntel
-        , initialFiles = [ ( "Scene.elm", Scene.harmonographStarter ) ]
+        , initialFiles = [ ( "Scene.elm", opening ) ]
         , urls = []
         , libUrls = []
         , title = "MathViz Studio"
@@ -36,10 +59,21 @@ main =
         , panels =
             -- Title-bar order; the shell appends the plain "Code" editor last. "Build" is the default
             -- view (panels[0]), so the studio opens on its sliders.
-            [ { icon = "form", title = "Build", tabs = [], view = Controls.build }
-            , { icon = "wizard", title = "Gallery", tabs = [], view = Controls.gallery }
+            [ { icon = "form", title = "Build", tabs = [], view = Controls.build registry }
+            , { icon = "wizard", title = "Gallery", tabs = [], view = Controls.gallery registry }
             ]
         }
+
+
+{-| The scene the editor opens with — the first registered visualisation's starter. -}
+opening : String
+opening =
+    case registry of
+        v :: _ ->
+            v.starter
+
+        [] ->
+            "scene = {}"
 
 
 {-| The scene is written in Elm, so reuse Elm syntax highlighting in the code pane. There is no
