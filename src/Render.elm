@@ -480,14 +480,21 @@ graph d =
                 _ ->
                     Nothing
 
-        -- the JS backend has no <text> element, so a node is a filled dot with a brighter rim
-        node ( x, y ) =
-            Svg.circle
-                [ A.cx (r2 x), A.cy (r2 y), A.r "9", A.fill d.stroke, A.opacity "0.95" ]
-                []
+        node label ( x, y ) =
+            [ Svg.circle [ A.cx (r2 x), A.cy (r2 y), A.r "13", A.fill d.stroke, A.opacity "0.95" ] []
+            , Svg.text_
+                [ A.x (r2 x)
+                , A.y (r2 y)
+                , A.textAnchor "middle"
+                , A.dominantBaseline "central"
+                , A.fontSize "11"
+                , A.fill "#0b0e14"
+                ]
+                [ Svg.text label ]
+            ]
 
         nodeSvgs =
-            List.map node (Array.toList placed)
+            List.concat (List.map2 node d.nodes (Array.toList placed))
     in
     stage (List.filterMap edgeLine d.edges ++ nodeSvgs)
 
