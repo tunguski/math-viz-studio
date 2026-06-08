@@ -4,7 +4,7 @@ module Draw exposing
     , r1, r2
     , fitTransform
     , project, rotate2, centroid
-    , curve
+    , curve, cloud
     )
 
 {-| Shared **visualisation primitives** — the SVG drawing helpers every visualisation reaches for, so
@@ -87,6 +87,76 @@ polyline width color pts =
         , A.strokeLinejoin "round"
         , A.strokeLinecap "round"
         , A.opacity "0.92"
+        ]
+        []
+
+
+{-| Draw a point cloud as tiny dots with a `Coloring`. A `Uniform` colouring is one cheap `<path>`; a
+`Varying` one bins the dots into bands **by position along the cloud's longer axis** (not by index —
+a chaos game visits points in a scattered order), so the colour sweeps smoothly across the cloud
+instead of looking like noise. -}
+cloud : String -> Coloring -> Float -> List ( Float, Float ) -> Svg msg
+cloud width coloring phase pts =
+    case coloring of
+        Color.Uniform f ->
+            dots width (f phase) pts
+
+        Color.Varying f ->
+            let
+                bands =
+                    24
+
+                xs =
+                    List.map Tuple.first pts
+
+                ys =
+                    List.map Tuple.second pts
+
+                ( loX, hiX ) =
+                    ( Maybe.withDefault 0 (List.minimum xs), Maybe.withDefault 1 (List.maximum xs) )
+
+                ( loY, hiY ) =
+                    ( Maybe.withDefault 0 (List.minimum ys), Maybe.withDefault 1 (List.maximum ys) )
+
+                useY =
+                    hiY - loY > hiX - loX
+
+                lo =
+                    if useY then loY else loX
+
+                span =
+                    max 0.0001
+                        (if useY then
+                            hiY - loY
+
+                         else
+                            hiX - loX
+                        )
+
+                binOf ( x, y ) =
+                    clamp 0 (bands - 1) (floor (((if useY then y else x) - lo) / span * toFloat bands))
+
+                binned =
+                    List.foldl
+                        (\p acc -> Array.set (binOf p) (p :: Maybe.withDefault [] (Array.get (binOf p) acc)) acc)
+                        (Array.repeat bands [])
+                        pts
+
+                band b =
+                    dots width (f (toFloat b / toFloat (bands - 1)) phase) (Maybe.withDefault [] (Array.get b binned))
+            in
+            Svg.g [] (List.map band (List.range 0 (bands - 1)))
+
+
+dots : String -> String -> List ( Float, Float ) -> Svg msg
+dots width color pts =
+    Svg.path
+        [ A.d (String.concat (List.map (\( x, y ) -> "M" ++ r1 x ++ " " ++ r1 y ++ "h0.4") pts))
+        , A.fill "none"
+        , A.stroke color
+        , A.strokeWidth width
+        , A.strokeLinecap "round"
+        , A.opacity "0.85"
         ]
         []
 

@@ -10,7 +10,6 @@ import Draw
 import Form
 import Html exposing (Html)
 import Svg exposing (Svg)
-import Svg.Attributes as A
 import Value
 import Viz exposing (Viz)
 
@@ -98,25 +97,10 @@ prepare d =
         ( cx, cy, scale ) =
             Draw.fitTransform raw
 
-        dots =
-            String.concat
-                (List.map
-                    (\( x, y ) -> "M" ++ Draw.r1 ((x - cx) * scale) ++ " " ++ Draw.r1 (-(y - cy) * scale) ++ "h0.35")
-                    raw
-                )
+        pts =
+            List.map (\( x, y ) -> ( (x - cx) * scale, -(y - cy) * scale )) raw
     in
-    \mode phase ->
-        Draw.stage
-            [ Svg.path
-                [ A.d dots
-                , A.fill "none"
-                , A.stroke (Color.solid (Color.resolve mode d.stroke) phase)
-                , A.strokeWidth "0.7"
-                , A.strokeLinecap "round"
-                , A.opacity "0.8"
-                ]
-                []
-            ]
+    \mode phase -> Draw.stage [ Draw.cloud "0.7" (Color.resolve mode d.stroke) phase pts ]
 
 
 orbit : Model -> Int -> List ( Float, Float )

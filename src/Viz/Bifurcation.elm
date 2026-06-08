@@ -10,7 +10,6 @@ import Draw
 import Form
 import Html exposing (Html)
 import Svg exposing (Svg)
-import Svg.Attributes as A
 import Value
 import Viz exposing (Viz)
 
@@ -113,33 +112,22 @@ prepare d =
                 px =
                     -280 + 560 * toFloat i / toFloat (max 1 (cols - 1))
             in
-            -- settle the orbit, then emit a dot per visited value
+            -- settle the orbit, then emit a point per visited value
             orbit r (settle + iters) settle px
 
-        dots =
-            String.concat (List.map column (List.range 0 (cols - 1)))
+        pts =
+            List.concatMap column (List.range 0 (cols - 1))
     in
-    \mode phase ->
-        Draw.stage
-            [ Svg.path
-                [ A.d dots
-                , A.fill "none"
-                , A.stroke (Color.solid (Color.resolve mode d.stroke) phase)
-                , A.strokeWidth "0.7"
-                , A.strokeLinecap "round"
-                , A.opacity "0.8"
-                ]
-                []
-            ]
+    \mode phase -> Draw.stage [ Draw.cloud "0.7" (Color.resolve mode d.stroke) phase pts ]
 
 
-{-| Iterate the logistic map `total` times from x=0.5, emitting a dot once past `settle` steps. -}
-orbit : Float -> Int -> Int -> Float -> String
+{-| Iterate the logistic map `total` times from x=0.5, emitting `(px, screenY)` once past `settle`. -}
+orbit : Float -> Int -> Int -> Float -> List ( Float, Float )
 orbit r total settle px =
     let
         go step x acc =
             if step >= total then
-                String.concat acc
+                acc
 
             else
                 let
@@ -148,7 +136,7 @@ orbit r total settle px =
 
                     acc2 =
                         if step >= settle then
-                            ("M" ++ Draw.r1 px ++ " " ++ Draw.r1 (280 - 560 * nx) ++ "h0.3") :: acc
+                            ( px, 280 - 560 * nx ) :: acc
 
                         else
                             acc
