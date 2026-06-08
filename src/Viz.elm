@@ -1,4 +1,4 @@
-module Viz exposing (Viz, find)
+module Viz exposing (Viz, Drawer, find)
 
 {-| The **plugin contract**: everything the studio needs to host one visualisation, with the model
 type hidden inside the module that provides it. The studio is configured with a `List Viz` (the
@@ -13,20 +13,27 @@ the registry is uniform even though each visualisation has a different model typ
   - `starter` — the source the gallery card switches to.
   - `movable` — whether the visualisation uses the animation clock (so the preview only ticks for
     the kinds that actually move).
-  - `render` — parse the source **once** and return a drawing function `Float -> Svg`: given the
+  - `render` — parse the source **once** and return a `Drawer`: given the colour mode and the
     animation phase, produce the SVG. Splitting it this way lets a visualisation do its
     phase-independent work (parsing, and any heavy precompute like integrating the Lorenz flow) once,
     so an animation frame only runs the cheap per-phase transform — no re-parsing or re-integrating
-    60 times a second. A static visualisation just ignores the phase. The SVG message type is `Never`;
-    the preview maps it into its own messages.
+    60 times a second. A static visualisation ignores the phase; the colour mode (see `Color`) lets
+    it evolve the stroke colour even when the geometry is still. The SVG message type is `Never`; the
+    preview maps it into its own messages.
   - `controls` — the Build panel: a form that re-prints the scene source on every change.
 
-@docs Viz, find
+@docs Viz, Drawer, find
 
 -}
 
 import Html exposing (Html)
 import Svg exposing (Svg)
+
+
+{-| What `render` returns: given the colour mode (a `Color` mode name) and the animation phase, draw
+the scene. Held in the preview and called once per frame. -}
+type alias Drawer =
+    String -> Float -> Svg Never
 
 
 {-| One hostable visualisation. -}
@@ -36,7 +43,7 @@ type alias Viz =
     , description : String
     , starter : String
     , movable : Bool
-    , render : String -> Result String (Float -> Svg Never)
+    , render : String -> Result String Drawer
     , controls : String -> Html String
     }
 

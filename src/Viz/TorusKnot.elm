@@ -6,11 +6,11 @@ yaw spins with the animation clock). `(2, 3)` is the trefoil. Self-contained: mo
 controls live here.
 -}
 
+import Color
 import Draw exposing (Vec3)
 import Form
 import Html exposing (Html)
 import Svg exposing (Svg)
-import Svg.Attributes as A
 import Value
 import Viz exposing (Viz)
 
@@ -91,7 +91,7 @@ toSource d =
 
 {-| Compute and centre the knot curve **once**, returning a drawer that only rotates, projects and
 stringifies per frame (so the spin never recomputes the curve). -}
-prepare : Model -> (Float -> Svg msg)
+prepare : Model -> (String -> Float -> Svg msg)
 prepare d =
     let
         path3 =
@@ -103,11 +103,11 @@ prepare d =
         centered =
             List.map (\v -> { x = v.x - c.x, y = v.y - c.y, z = v.z - c.z }) path3
     in
-    \phase -> draw d centered phase
+    \mode phase -> draw d centered mode phase
 
 
-draw : Model -> List Vec3 -> Float -> Svg msg
-draw d centered phase =
+draw : Model -> List Vec3 -> String -> Float -> Svg msg
+draw d centered mode phase =
     let
         proj =
             List.map (Draw.rotate2 (d.yaw + phase) d.pitch) centered
@@ -116,23 +116,9 @@ draw d centered phase =
             Draw.fitTransform proj
 
         screen ( x, y ) =
-            Draw.r2 ((x - cx) * scale) ++ "," ++ Draw.r2 (-(y - cy) * scale)
-
-        pts =
-            String.join " " (List.map screen proj)
+            ( (x - cx) * scale, -(y - cy) * scale )
     in
-    Draw.stage
-        [ Svg.polyline
-            [ A.points pts
-            , A.fill "none"
-            , A.stroke d.stroke
-            , A.strokeWidth "2"
-            , A.strokeLinejoin "round"
-            , A.strokeLinecap "round"
-            , A.opacity "0.92"
-            ]
-            []
-        ]
+    Draw.stage [ Draw.curve "2" (Color.resolve mode d.stroke) phase (List.map screen proj) ]
 
 
 {-| The (p, q) torus knot as a closed space curve. -}

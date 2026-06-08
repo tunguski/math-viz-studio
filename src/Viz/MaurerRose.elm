@@ -5,11 +5,11 @@ module Viz.MaurerRose exposing (viz)
 the petals. Two integers, a world of patterns. Self-contained: model, render and controls live here.
 -}
 
+import Color
 import Draw
 import Form
 import Html exposing (Html)
 import Svg exposing (Svg)
-import Svg.Attributes as A
 import Value
 import Viz exposing (Viz)
 
@@ -28,7 +28,7 @@ viz =
     , description = "Chords around a rose curve weave a lattice."
     , starter = toSource default
     , movable = False
-    , render = \source -> Result.map (\m -> always (view m)) (decode source)
+    , render = \source -> Result.map prepare (decode source)
     , controls = controls
     }
 
@@ -72,8 +72,10 @@ toSource d =
 -- RENDER ------------------------------------------------------------------------------------------
 
 
-view : Model -> Svg msg
-view d =
+{-| The 361 chord vertices are phase-independent, so compute them once; the returned drawer only
+applies the colouring. -}
+prepare : Model -> (String -> Float -> Svg msg)
+prepare d =
     let
         scale =
             275
@@ -86,22 +88,12 @@ view d =
                 r =
                     sin (toFloat d.n * theta) * scale
             in
-            Draw.r2 (r * cos theta) ++ "," ++ Draw.r2 (r * sin theta)
+            ( r * cos theta, r * sin theta )
 
         pts =
-            String.join " " (List.map point (List.range 0 360))
+            List.map point (List.range 0 360)
     in
-    Draw.stage
-        [ Svg.polyline
-            [ A.points pts
-            , A.fill "none"
-            , A.stroke d.stroke
-            , A.strokeWidth "1"
-            , A.strokeLinejoin "round"
-            , A.opacity "0.9"
-            ]
-            []
-        ]
+    \mode phase -> Draw.stage [ Draw.curve "1" (Color.resolve mode d.stroke) phase pts ]
 
 
 

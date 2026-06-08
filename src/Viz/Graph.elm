@@ -5,6 +5,7 @@ Fruchterman–Reingold spring simulation. The model *is* the graph.
 -}
 
 import Array exposing (Array)
+import Color
 import Draw
 import Form
 import Html exposing (Html)
@@ -29,7 +30,7 @@ viz =
     , description = "A network laid out by a spring simulation."
     , starter = toSource wheel
     , movable = False
-    , render = \source -> Result.map (\m -> always (view m)) (decode source)
+    , render = \source -> Result.map prepare (decode source)
     , controls = controls
     }
 
@@ -90,8 +91,9 @@ edgeStr ( i, j ) =
 -- RENDER ------------------------------------------------------------------------------------------
 
 
-view : Model -> Svg msg
-view d =
+{-| Run the spring layout **once**; the drawer only recolours the edges and nodes. -}
+prepare : Model -> (String -> Float -> Svg msg)
+prepare d =
     let
         positions =
             layout (List.length d.nodes) d.edges (clamp 1 400 d.iterations)
@@ -101,7 +103,13 @@ view d =
 
         placed =
             Array.fromList (List.map (\( x, y ) -> ( (x - cx) * scale, -(y - cy) * scale )) positions)
+    in
+    \mode phase -> draw d placed (Color.solid (Color.resolve mode d.stroke) phase)
 
+
+draw : Model -> Array ( Float, Float ) -> String -> Svg msg
+draw d placed color =
+    let
         line ( a, b ) =
             case ( Array.get a placed, Array.get b placed ) of
                 ( Just ( x1, y1 ), Just ( x2, y2 ) ) ->
@@ -111,7 +119,7 @@ view d =
                             , A.y1 (Draw.r2 y1)
                             , A.x2 (Draw.r2 x2)
                             , A.y2 (Draw.r2 y2)
-                            , A.stroke d.stroke
+                            , A.stroke color
                             , A.strokeWidth "1.6"
                             , A.opacity "0.5"
                             ]
@@ -122,7 +130,7 @@ view d =
                     Nothing
 
         node label ( x, y ) =
-            [ Svg.circle [ A.cx (Draw.r2 x), A.cy (Draw.r2 y), A.r "13", A.fill d.stroke, A.opacity "0.95" ] []
+            [ Svg.circle [ A.cx (Draw.r2 x), A.cy (Draw.r2 y), A.r "13", A.fill color, A.opacity "0.95" ] []
             , Svg.text_
                 [ A.x (Draw.r2 x)
                 , A.y (Draw.r2 y)

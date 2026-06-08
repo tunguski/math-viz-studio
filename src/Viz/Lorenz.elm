@@ -4,11 +4,11 @@ module Viz.Lorenz exposing (viz)
 Euler-integrated and projected (and spun by yaw, which the animation clock drives).
 -}
 
+import Color
 import Draw exposing (Vec3)
 import Form
 import Html exposing (Html)
 import Svg exposing (Svg)
-import Svg.Attributes as A
 import Value
 import Viz exposing (Viz)
 
@@ -97,7 +97,7 @@ toSource d =
 
 {-| Integrate and centre the trajectory **once**, returning a drawer that only rotates, projects and
 stringifies per frame (so animation never re-integrates 9000 Euler steps). -}
-prepare : Model -> (Float -> Svg msg)
+prepare : Model -> (String -> Float -> Svg msg)
 prepare d =
     let
         path3 =
@@ -109,11 +109,11 @@ prepare d =
         centered =
             List.map (\p -> { x = p.x - c.x, y = p.y - c.y, z = p.z - c.z }) path3
     in
-    \phase -> draw d centered phase
+    \mode phase -> draw d centered mode phase
 
 
-draw : Model -> List Vec3 -> Float -> Svg msg
-draw d centered phase =
+draw : Model -> List Vec3 -> String -> Float -> Svg msg
+draw d centered mode phase =
     let
         proj =
             List.map (Draw.rotate2 (d.yaw + phase) d.pitch) centered
@@ -122,22 +122,9 @@ draw d centered phase =
             Draw.fitTransform proj
 
         screen ( x, y ) =
-            Draw.r2 ((x - cx) * scale) ++ "," ++ Draw.r2 (-(y - cy) * scale)
-
-        pts =
-            String.join " " (List.map screen proj)
+            ( (x - cx) * scale, -(y - cy) * scale )
     in
-    Draw.stage
-        [ Svg.polyline
-            [ A.points pts
-            , A.fill "none"
-            , A.stroke d.stroke
-            , A.strokeWidth "1"
-            , A.strokeLinecap "round"
-            , A.opacity "0.9"
-            ]
-            []
-        ]
+    Draw.stage [ Draw.curve "1" (Color.resolve mode d.stroke) phase (List.map screen proj) ]
 
 
 {-| Euler-integrate the Lorenz system from a point just off the origin. -}

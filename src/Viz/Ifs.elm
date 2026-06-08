@@ -5,6 +5,7 @@ game that scatters `points` dots. The classic example is the Barnsley fern. Self
 decode/print, render and controls all live here.
 -}
 
+import Color
 import Draw
 import Form
 import Html exposing (Html)
@@ -33,7 +34,7 @@ viz =
     , description = "A chaos-game fractal, like the Barnsley fern."
     , starter = toSource fern
     , movable = False
-    , render = \source -> Result.map (\m -> always (view m)) (decode source)
+    , render = \source -> Result.map prepare (decode source)
     , controls = controls
     }
 
@@ -101,8 +102,10 @@ affineStr m =
 -- RENDER ------------------------------------------------------------------------------------------
 
 
-view : Model -> Svg msg
-view d =
+{-| Run the chaos game **once** into a dot path; the returned drawer only restrokes it with the
+current colour. -}
+prepare : Model -> (String -> Float -> Svg msg)
+prepare d =
     let
         raw =
             chaosGame d.maps (clamp 100 40000 d.points)
@@ -117,17 +120,18 @@ view d =
                     raw
                 )
     in
-    Draw.stage
-        [ Svg.path
-            [ A.d dots
-            , A.fill "none"
-            , A.stroke d.stroke
-            , A.strokeWidth "0.85"
-            , A.strokeLinecap "round"
-            , A.opacity "0.85"
+    \mode phase ->
+        Draw.stage
+            [ Svg.path
+                [ A.d dots
+                , A.fill "none"
+                , A.stroke (Color.solid (Color.resolve mode d.stroke) phase)
+                , A.strokeWidth "0.85"
+                , A.strokeLinecap "round"
+                , A.opacity "0.85"
+                ]
+                []
             ]
-            []
-        ]
 
 
 {-| The chaos game: from the origin, repeatedly pick a map (by its probability) and apply it,

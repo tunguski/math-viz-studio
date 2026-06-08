@@ -6,6 +6,7 @@ decide whether it is a node, saddle, spiral or centre. Self-contained: model, de
 and controls all live here.
 -}
 
+import Color
 import Draw
 import Form
 import Html exposing (Html)
@@ -32,7 +33,7 @@ viz =
     , description = "The phase portrait of a 2×2 linear system."
     , starter = toSource spiral
     , movable = False
-    , render = \source -> Result.map (\m -> always (view m)) (decode source)
+    , render = \source -> Result.map prepare (decode source)
     , controls = controls
     }
 
@@ -84,8 +85,9 @@ toSource d =
 -- RENDER ------------------------------------------------------------------------------------------
 
 
-view : Model -> Svg msg
-view d =
+{-| Build the arrow path **once**; the drawer only restrokes it with the current colour. -}
+prepare : Model -> (String -> Float -> Svg msg)
+prepare d =
     let
         g =
             clamp 4 28 d.grid
@@ -155,18 +157,19 @@ view d =
                     (List.range 0 (g - 1))
                 )
     in
-    Draw.stage
-        [ Svg.path
-            [ A.d paths
-            , A.fill "none"
-            , A.stroke d.stroke
-            , A.strokeWidth "1.4"
-            , A.strokeLinecap "round"
-            , A.strokeLinejoin "round"
-            , A.opacity "0.85"
+    \mode phase ->
+        Draw.stage
+            [ Svg.path
+                [ A.d paths
+                , A.fill "none"
+                , A.stroke (Color.solid (Color.resolve mode d.stroke) phase)
+                , A.strokeWidth "1.4"
+                , A.strokeLinecap "round"
+                , A.strokeLinejoin "round"
+                , A.opacity "0.85"
+                ]
+                []
             ]
-            []
-        ]
 
 
 

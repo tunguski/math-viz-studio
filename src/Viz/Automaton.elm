@@ -6,6 +6,7 @@ diagram is drawn as one filled `<path>`.
 -}
 
 import Array exposing (Array)
+import Color
 import Draw
 import Form
 import Html exposing (Html)
@@ -31,7 +32,7 @@ viz =
     , description = "An elementary Wolfram rule, drawn row by row."
     , starter = toSource default
     , movable = False
-    , render = \source -> Result.map (\m -> always (view m)) (decode source)
+    , render = \source -> Result.map prepare (decode source)
     , controls = controls
     }
 
@@ -81,8 +82,9 @@ toSource d =
 -- RENDER ------------------------------------------------------------------------------------------
 
 
-view : Model -> Svg msg
-view d =
+{-| Evolve the rule **once** into a filled path; the drawer only recolours it. -}
+prepare : Model -> (String -> Float -> Svg msg)
+prepare d =
     let
         w =
             clamp 5 251 d.width
@@ -127,7 +129,8 @@ view d =
                     )
                 )
     in
-    Draw.stage [ Svg.path [ A.d squares, A.fill d.stroke, A.opacity "0.95" ] [] ]
+    \mode phase ->
+        Draw.stage [ Svg.path [ A.d squares, A.fill (Color.solid (Color.resolve mode d.stroke) phase), A.opacity "0.95" ] [] ]
 
 
 square : Float -> Float -> Float -> String

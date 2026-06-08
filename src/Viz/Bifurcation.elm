@@ -5,6 +5,7 @@ range, settle the orbit and then plot the values it visits. The result is the cl
 road to chaos. Self-contained: model, decode/print, render and controls all live here.
 -}
 
+import Color
 import Draw
 import Form
 import Html exposing (Html)
@@ -31,7 +32,7 @@ viz =
     , description = "The logistic map's period-doubling route to chaos."
     , starter = toSource default
     , movable = False
-    , render = \source -> Result.map (\m -> always (view m)) (decode source)
+    , render = \source -> Result.map prepare (decode source)
     , controls = controls
     }
 
@@ -88,8 +89,9 @@ toSource d =
 -- RENDER ------------------------------------------------------------------------------------------
 
 
-view : Model -> Svg msg
-view d =
+{-| Iterate every column **once** into a dot path; the drawer only restrokes it. -}
+prepare : Model -> (String -> Float -> Svg msg)
+prepare d =
     let
         cols =
             clamp 50 1500 d.columns
@@ -117,17 +119,18 @@ view d =
         dots =
             String.concat (List.map column (List.range 0 (cols - 1)))
     in
-    Draw.stage
-        [ Svg.path
-            [ A.d dots
-            , A.fill "none"
-            , A.stroke d.stroke
-            , A.strokeWidth "0.7"
-            , A.strokeLinecap "round"
-            , A.opacity "0.8"
+    \mode phase ->
+        Draw.stage
+            [ Svg.path
+                [ A.d dots
+                , A.fill "none"
+                , A.stroke (Color.solid (Color.resolve mode d.stroke) phase)
+                , A.strokeWidth "0.7"
+                , A.strokeLinecap "round"
+                , A.opacity "0.8"
+                ]
+                []
             ]
-            []
-        ]
 
 
 {-| Iterate the logistic map `total` times from x=0.5, emitting a dot once past `settle` steps. -}

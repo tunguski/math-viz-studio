@@ -4,6 +4,7 @@ module Draw exposing
     , r1, r2
     , fitTransform
     , project, rotate2, centroid
+    , curve
     )
 
 {-| Shared **visualisation primitives** — the SVG drawing helpers every visualisation reaches for, so
@@ -22,6 +23,8 @@ the per-visualisation modules only contain what is specific to them.
 
 -}
 
+import Array exposing (Array)
+import Color exposing (Coloring)
 import Svg exposing (Svg)
 import Svg.Attributes as A
 
@@ -29,6 +32,63 @@ import Svg.Attributes as A
 {-| A point in 3-space (a vertex, a trajectory sample). -}
 type alias Vec3 =
     { x : Float, y : Float, z : Float }
+
+
+{-| Draw a curve through `pts` with a `Coloring`. A `Uniform` coloring is one cheap `<polyline>`; a
+`Varying` one is split into a couple of dozen bands (each a `<polyline>` sharing its endpoints with
+its neighbours, so the line stays continuous) so the colour can sweep along the curve. -}
+curve : String -> Coloring -> Float -> List ( Float, Float ) -> Svg msg
+curve width coloring phase pts =
+    case coloring of
+        Color.Uniform f ->
+            polyline width (f phase) pts
+
+        Color.Varying f ->
+            let
+                arr =
+                    Array.fromList pts
+
+                n =
+                    Array.length arr
+
+                bands =
+                    clamp 1 24 (n // 2)
+
+                per =
+                    max 1 (n // bands)
+
+                band b =
+                    let
+                        start =
+                            b * per
+
+                        end =
+                            if b == bands - 1 then
+                                n
+
+                            else
+                                (b + 1) * per + 1
+
+                        t =
+                            toFloat b / toFloat (max 1 (bands - 1))
+                    in
+                    polyline width (f t phase) (Array.toList (Array.slice start end arr))
+            in
+            Svg.g [] (List.map band (List.range 0 (bands - 1)))
+
+
+polyline : String -> String -> List ( Float, Float ) -> Svg msg
+polyline width color pts =
+    Svg.polyline
+        [ A.points (String.join " " (List.map (\( x, y ) -> r2 x ++ "," ++ r2 y) pts))
+        , A.fill "none"
+        , A.stroke color
+        , A.strokeWidth width
+        , A.strokeLinejoin "round"
+        , A.strokeLinecap "round"
+        , A.opacity "0.92"
+        ]
+        []
 
 
 {-| The shared frame: a centred 600×600 viewBox the renderers draw into (origin in the middle, the

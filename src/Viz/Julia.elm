@@ -8,6 +8,7 @@ To keep the DOM small, cells are bucketed by escape time and each bucket is draw
 `<path>` — so the whole grid is a few dozen nodes, not tens of thousands.
 -}
 
+import Color
 import Dict exposing (Dict)
 import Draw
 import Form
@@ -35,7 +36,7 @@ viz =
     , description = "Escape-time fractal of z ↦ z² + c — move c and watch it morph."
     , starter = toSource rabbit
     , movable = False
-    , render = \source -> Result.map (\m -> always (view m)) (decode source)
+    , render = \source -> Result.map prepare (decode source)
     , controls = controls
     }
 
@@ -87,8 +88,10 @@ toSource d =
 -- RENDER ------------------------------------------------------------------------------------------
 
 
-view : Model -> Svg msg
-view d =
+{-| Compute the escape-time grid **once**; the drawer only repaints the bands (so the time colour
+modes hue-rotate the whole fractal without recomputing it). -}
+prepare : Model -> (String -> Float -> Svg msg)
+prepare d =
     let
         res =
             clamp 30 160 d.resolution
@@ -134,14 +137,24 @@ view d =
                 Dict.empty
                 cells
 
-        bandPath ( band, rects ) =
-            Svg.path
-                [ A.d (String.concat rects)
-                , A.fill (bandColor d.hue maxIter d.stroke band)
-                ]
-                []
     in
-    Draw.stage (List.map bandPath (Dict.toList buckets))
+    \mode phase ->
+        let
+            offset =
+                if Color.timeVarying mode then
+                    phase * 60
+
+                else
+                    0
+
+            bandPath ( band, rects ) =
+                Svg.path
+                    [ A.d (String.concat rects)
+                    , A.fill (bandColor (d.hue + offset) maxIter d.stroke band)
+                    ]
+                    []
+        in
+        Draw.stage (List.map bandPath (Dict.toList buckets))
 
 
 {-| Escape time of `z₀` under `z ↦ z² + c`: the step at which |z| first exceeds 2, or `maxIter`. -}

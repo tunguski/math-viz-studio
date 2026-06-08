@@ -5,6 +5,7 @@ yaw/pitch the renderer rotates it by before projecting (the yaw also spins with 
 -}
 
 import Array exposing (Array)
+import Color
 import Draw exposing (Vec3)
 import Form
 import Html exposing (Html)
@@ -30,7 +31,7 @@ viz =
     , description = "A rotating wireframe solid you can spin."
     , starter = toSource cube
     , movable = True
-    , render = \source -> Result.map (\m -> \phase -> view phase m) (decode source)
+    , render = \source -> Result.map (\m -> \mode phase -> view (Color.solid (Color.resolve mode m.stroke) phase) phase m) (decode source)
     , controls = controls
     }
 
@@ -113,8 +114,8 @@ edgeStr ( i, j ) =
 -- RENDER ------------------------------------------------------------------------------------------
 
 
-view : Float -> Model -> Svg msg
-view phase d =
+view : String -> Float -> Model -> Svg msg
+view color phase d =
     let
         projected =
             Array.fromList (List.map (Draw.project (d.yaw + phase) d.pitch) d.vertices)
@@ -128,7 +129,7 @@ view phase d =
                             , A.y1 (Draw.r2 y1)
                             , A.x2 (Draw.r2 x2)
                             , A.y2 (Draw.r2 y2)
-                            , A.stroke d.stroke
+                            , A.stroke color
                             , A.strokeWidth "2"
                             , A.opacity "0.9"
                             , A.strokeLinecap "round"
@@ -140,7 +141,7 @@ view phase d =
                     Nothing
 
         dot ( x, y ) =
-            Svg.circle [ A.cx (Draw.r2 x), A.cy (Draw.r2 y), A.r "3.2", A.fill d.stroke ] []
+            Svg.circle [ A.cx (Draw.r2 x), A.cy (Draw.r2 y), A.r "3.2", A.fill color ] []
     in
     Draw.stage (List.filterMap line d.edges ++ List.map dot (Array.toList projected))
 

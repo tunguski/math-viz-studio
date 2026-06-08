@@ -6,11 +6,11 @@ self-contained visualisation: its model, its decode/print, its render and its co
 it exposes one `viz : Viz`.
 -}
 
+import Color
 import Draw
 import Form
 import Html exposing (Html)
 import Svg exposing (Svg)
-import Svg.Attributes as A
 import Value exposing (V)
 import Viz exposing (Viz)
 
@@ -119,7 +119,7 @@ pendulumStr p =
 {-| Precompute, for every sample, each oscillator's `(envelope, base-angle)` on both axes — the whole
 phase-independent part (the `amp·e^(−decay·t)` envelope and the `freq·t + phase` angle). An animation
 frame then only sums `env·sin(angle + φ)`, with no `exp` and no `freq·t` recomputed. -}
-prepare : Model -> (Float -> Svg msg)
+prepare : Model -> (String -> Float -> Svg msg)
 prepare d =
     let
         count =
@@ -146,28 +146,12 @@ prepare d =
         yc =
             components d.y
     in
-    \phase -> draw d xc yc phase
-
-
-draw : Model -> List (List ( Float, Float )) -> List (List ( Float, Float )) -> Float -> Svg msg
-draw d xc yc phase =
-    let
-        point xs ys =
-            Draw.r2 (sumComponents phase xs) ++ "," ++ Draw.r2 (sumComponents phase ys)
-
-        pts =
-            String.join " " (List.map2 point xc yc)
-    in
-    Draw.stage
-        [ Svg.polyline
-            [ A.points pts
-            , A.fill "none"
-            , A.stroke d.stroke
-            , A.strokeWidth "1.1"
-            , A.opacity "0.92"
-            ]
-            []
-        ]
+    \mode phase ->
+        let
+            point xs ys =
+                ( sumComponents phase xs, sumComponents phase ys )
+        in
+        Draw.stage [ Draw.curve "1.1" (Color.resolve mode d.stroke) phase (List.map2 point xc yc) ]
 
 
 {-| Sum the precomputed components of one sample at the current phase: `Σ env·sin(angle + φ)`. -}

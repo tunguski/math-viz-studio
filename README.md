@@ -62,6 +62,23 @@ The code pane offers three tabs, all editing the same `scene` file:
 The result pane plays/pauses an animation (the curve precesses, the solid spins) and copies the model
 source.
 
+## Colouring
+
+The base `stroke` colour is part of the model; *how* it evolves is a view choice, picked with the
+🎨 button in the result pane (the dynamic modes use the animation clock, so press ▶ Animate too).
+The modes are a small pluggable registry in [`Color`](src/Color.elm) — add a branch to `resolve`
+(and a name to `modes`) and every visualisation gets it:
+
+- **Fixed** — the base colour, unchanged (the original behaviour).
+- **Cycle** — the whole figure's hue rotates over time (animates even a static figure, like the fern).
+- **Gradient** — the hue sweeps along the figure's natural parameter (most striking on the curves).
+- **Pulse** — a bright band travels along the figure, driven by the clock.
+
+A `Coloring` is `Uniform` (one colour for the figure, maybe time-varying) or `Varying` (a colour per
+position), so a renderer draws a single cheap stroke when the colour doesn't vary along the figure and
+only bands the path ([`Draw.curve`](src/Draw.elm)) when it does. The Julia set, already escape-time
+coloured, hue-rotates its whole palette under the time modes.
+
 ## How it fits together — a registry of self-contained visualisations
 
 The studio is configured by **one list** in `Main` — the registry. Each entry is a self-contained
@@ -74,7 +91,8 @@ Shared infrastructure (one place each, reused by every visualisation):
 | Module | Layer | Role |
 |---|---|---|
 | `Value` | **data** | Reads the `scene = { … }` Elm value out of the source (`parseScene`, decode accessors) and prints values back (`header`, `renderList`, `numStr`). The model is just data — no interpreter. |
-| `Draw` | **visualisation** | SVG primitives — the shared `stage`, coordinate rounding, `fitTransform`, and the 3-D `project`/`rotate2`/`centroid`. |
+| `Draw` | **visualisation** | SVG primitives — the shared `stage`, coordinate rounding, `fitTransform`, the 3-D `project`/`rotate2`/`centroid`, and `curve` (a colourable, optionally banded polyline). |
+| `Color` | **visualisation** | The pluggable colour-evolution registry: `fixed`/`cycle`/`gradient`/`pulse`, resolved from a base colour to a `Coloring`. |
 | `Form` | **controls** | The Build-panel widgets (`slider`, `colorRow`, `numCell`, `preset`, …); each returns `Html String` whose message *is* the new scene source. |
 | `Viz` | **contract** | The plugin record `Viz` (`kind`, `name`, `description`, `starter`, `movable`, `render`, `controls`) and `find`. The model type stays hidden inside each module. |
 
