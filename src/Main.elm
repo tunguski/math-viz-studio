@@ -27,6 +27,7 @@ import Viz.Automaton
 import Viz.Bifurcation
 import Viz.Chladni
 import Viz.Clifford
+import Viz.DomainColor
 import Viz.Graph
 import Viz.Harmonograph
 import Viz.Hilbert
@@ -35,12 +36,16 @@ import Viz.Julia
 import Viz.LSystem
 import Viz.Lorenz
 import Viz.Mandelbrot
+import Viz.MatrixGrid
 import Viz.MaurerRose
 import Viz.Newton
 import Viz.Phyllotaxis
 import Viz.Polyhedron
+import Viz.RandomWalk
 import Viz.Rossler
+import Viz.Spirograph
 import Viz.Superformula
+import Viz.Torus
 import Viz.TorusKnot
 import Viz.Ulam
 import Viz.VectorField
@@ -51,21 +56,26 @@ registry : List Viz
 registry =
     [ Viz.Harmonograph.viz
     , Viz.MaurerRose.viz
+    , Viz.Spirograph.viz
     , Viz.Superformula.viz
     , Viz.Ifs.viz
     , Viz.Julia.viz
     , Viz.Mandelbrot.viz
     , Viz.Newton.viz
+    , Viz.DomainColor.viz
     , Viz.LSystem.viz
     , Viz.Hilbert.viz
     , Viz.Polyhedron.viz
+    , Viz.Torus.viz
     , Viz.TorusKnot.viz
     , Viz.Lorenz.viz
     , Viz.Rossler.viz
     , Viz.Clifford.viz
     , Viz.Bifurcation.viz
     , Viz.VectorField.viz
+    , Viz.MatrixGrid.viz
     , Viz.Phyllotaxis.viz
+    , Viz.RandomWalk.viz
     , Viz.Ulam.viz
     , Viz.Chladni.viz
     , Viz.Graph.viz

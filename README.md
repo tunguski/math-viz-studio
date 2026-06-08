@@ -40,6 +40,11 @@ curves and formal grammars:
 | **Phyllotaxis** | A sunflower's golden-angle seed spiral (per-dot, so gradient paints it) | `{ count, angle, spread, stroke }` |
 | **Ulam spiral** | Primes on a number spiral — they line up on diagonals (number theory) | `{ size, stroke }` |
 | **Chladni figure** | The nodal pattern of a vibrating plate (wave physics) | `{ n, m, resolution, stroke }` |
+| **Spirograph** | The looping hypotrochoid of a circle rolling inside a circle | `{ bigR, smallR, pen, samples, stroke }` |
+| **Random walk** | A drunkard's wander — discrete Brownian motion | `{ steps, seed, stepSize, stroke }` |
+| **Domain colouring** | A complex function `f(z)` pictured by colour (hue = its angle) | `{ fn, resolution, hue }` |
+| **Matrix transform** | How a 2×2 matrix shears/rotates/scales the plane (linear algebra) | `{ a, b, c, d, lines, stroke }` |
+| **Torus** | A doughnut surface as a spinning wireframe of circles | `{ bigR, smallR, segU, segV, yaw, pitch, stroke }` |
 
 For example, the harmonograph model is just data:
 
