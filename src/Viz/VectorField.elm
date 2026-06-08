@@ -32,7 +32,7 @@ viz =
     , description = "The phase portrait of a 2×2 linear system."
     , starter = toSource spiral
     , movable = False
-    , render = \_ source -> Result.map view (decode source)
+    , render = \source -> Result.map (\m -> always (view m)) (decode source)
     , controls = controls
     }
 

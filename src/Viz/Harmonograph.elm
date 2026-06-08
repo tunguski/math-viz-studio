@@ -37,7 +37,7 @@ viz =
     , description = "Sums of damped sinusoids — looping plane curves."
     , starter = toSource default
     , movable = True
-    , render = \phase source -> Result.map (view phase) (decode source)
+    , render = \source -> Result.map prepare (decode source)
     , controls = controls
     }
 
@@ -116,8 +116,11 @@ pendulumStr p =
 -- RENDER ------------------------------------------------------------------------------------------
 
 
-view : Float -> Model -> Svg msg
-view phase d =
+{-| Precompute, for every sample, each oscillator's `(envelope, base-angle)` on both axes — the whole
+phase-independent part (the `amp·e^(−decay·t)` envelope and the `freq·t + phase` angle). An animation
+frame then only sums `env·sin(angle + φ)`, with no `exp` and no `freq·t` recomputed. -}
+prepare : Model -> (Float -> Svg msg)
+prepare d =
     let
         count =
             max 2 d.samples
@@ -126,21 +129,34 @@ view phase d =
         tSpan =
             220.0
 
-        xs =
-            shiftPhase phase d.x
+        components axis =
+            List.map
+                (\i ->
+                    let
+                        t =
+                            toFloat i / toFloat (count - 1) * tSpan
+                    in
+                    List.map (\p -> ( p.amp * e ^ (-p.decay * t), p.freq * t + p.phase )) axis
+                )
+                (List.range 0 (count - 1))
 
-        ys =
-            shiftPhase phase d.y
+        xc =
+            components d.x
 
-        point i =
-            let
-                t =
-                    toFloat i / toFloat (count - 1) * tSpan
-            in
-            Draw.r2 (sumPend t xs) ++ "," ++ Draw.r2 (sumPend t ys)
+        yc =
+            components d.y
+    in
+    \phase -> draw d xc yc phase
+
+
+draw : Model -> List (List ( Float, Float )) -> List (List ( Float, Float )) -> Float -> Svg msg
+draw d xc yc phase =
+    let
+        point xs ys =
+            Draw.r2 (sumComponents phase xs) ++ "," ++ Draw.r2 (sumComponents phase ys)
 
         pts =
-            String.join " " (List.map point (List.range 0 (count - 1)))
+            String.join " " (List.map2 point xc yc)
     in
     Draw.stage
         [ Svg.polyline
@@ -154,15 +170,10 @@ view phase d =
         ]
 
 
-sumPend : Float -> List Pendulum -> Float
-sumPend t ps =
-    List.foldl (\p acc -> acc + p.amp * sin (p.freq * t + p.phase) * e ^ (-p.decay * t)) 0 ps
-
-
-{-| Slowly precess every oscillator by the animation phase (a no-op at phase 0). -}
-shiftPhase : Float -> List Pendulum -> List Pendulum
-shiftPhase phase ps =
-    List.map (\p -> { p | phase = p.phase + phase }) ps
+{-| Sum the precomputed components of one sample at the current phase: `Σ env·sin(angle + φ)`. -}
+sumComponents : Float -> List ( Float, Float ) -> Float
+sumComponents phase comps =
+    List.foldl (\( env, ang ) acc -> acc + env * sin (ang + phase)) 0 comps
 
 
 

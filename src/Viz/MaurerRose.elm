@@ -28,7 +28,7 @@ viz =
     , description = "Chords around a rose curve weave a lattice."
     , starter = toSource default
     , movable = False
-    , render = \_ source -> Result.map view (decode source)
+    , render = \source -> Result.map (\m -> always (view m)) (decode source)
     , controls = controls
     }
 

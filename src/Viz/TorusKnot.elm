@@ -32,7 +32,7 @@ viz =
     , description = "A (p, q) knot wound on a torus — the (2, 3) is a trefoil."
     , starter = toSource default
     , movable = True
-    , render = \phase source -> Result.map (view phase) (decode source)
+    , render = \source -> Result.map prepare (decode source)
     , controls = controls
     }
 
@@ -89,8 +89,10 @@ toSource d =
 -- RENDER ------------------------------------------------------------------------------------------
 
 
-view : Float -> Model -> Svg msg
-view phase d =
+{-| Compute and centre the knot curve **once**, returning a drawer that only rotates, projects and
+stringifies per frame (so the spin never recomputes the curve). -}
+prepare : Model -> (Float -> Svg msg)
+prepare d =
     let
         path3 =
             curve d
@@ -98,8 +100,17 @@ view phase d =
         c =
             Draw.centroid path3
 
+        centered =
+            List.map (\v -> { x = v.x - c.x, y = v.y - c.y, z = v.z - c.z }) path3
+    in
+    \phase -> draw d centered phase
+
+
+draw : Model -> List Vec3 -> Float -> Svg msg
+draw d centered phase =
+    let
         proj =
-            List.map (\v -> Draw.rotate2 (d.yaw + phase) d.pitch { x = v.x - c.x, y = v.y - c.y, z = v.z - c.z }) path3
+            List.map (Draw.rotate2 (d.yaw + phase) d.pitch) centered
 
         ( cx, cy, scale ) =
             Draw.fitTransform proj

@@ -33,7 +33,7 @@ viz =
     , description = "A chaos-game fractal, like the Barnsley fern."
     , starter = toSource fern
     , movable = False
-    , render = \_ source -> Result.map view (decode source)
+    , render = \source -> Result.map (\m -> always (view m)) (decode source)
     , controls = controls
     }
 

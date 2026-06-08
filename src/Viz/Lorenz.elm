@@ -32,7 +32,7 @@ viz =
     , description = "A strange attractor — the chaotic butterfly flow."
     , starter = toSource default
     , movable = True
-    , render = \phase source -> Result.map (view phase) (decode source)
+    , render = \source -> Result.map prepare (decode source)
     , controls = controls
     }
 
@@ -95,8 +95,10 @@ toSource d =
 -- RENDER ------------------------------------------------------------------------------------------
 
 
-view : Float -> Model -> Svg msg
-view phase d =
+{-| Integrate and centre the trajectory **once**, returning a drawer that only rotates, projects and
+stringifies per frame (so animation never re-integrates 9000 Euler steps). -}
+prepare : Model -> (Float -> Svg msg)
+prepare d =
     let
         path3 =
             integrate d
@@ -104,17 +106,26 @@ view phase d =
         c =
             Draw.centroid path3
 
+        centered =
+            List.map (\p -> { x = p.x - c.x, y = p.y - c.y, z = p.z - c.z }) path3
+    in
+    \phase -> draw d centered phase
+
+
+draw : Model -> List Vec3 -> Float -> Svg msg
+draw d centered phase =
+    let
         proj =
-            List.map (\p -> Draw.rotate2 (d.yaw + phase) d.pitch { x = p.x - c.x, y = p.y - c.y, z = p.z - c.z }) path3
+            List.map (Draw.rotate2 (d.yaw + phase) d.pitch) centered
 
         ( cx, cy, scale ) =
             Draw.fitTransform proj
 
-        toScreen ( x, y ) =
+        screen ( x, y ) =
             Draw.r2 ((x - cx) * scale) ++ "," ++ Draw.r2 (-(y - cy) * scale)
 
         pts =
-            String.join " " (List.map toScreen proj)
+            String.join " " (List.map screen proj)
     in
     Draw.stage
         [ Svg.polyline

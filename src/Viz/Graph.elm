@@ -29,7 +29,7 @@ viz =
     , description = "A network laid out by a spring simulation."
     , starter = toSource wheel
     , movable = False
-    , render = \_ source -> Result.map view (decode source)
+    , render = \source -> Result.map (\m -> always (view m)) (decode source)
     , controls = controls
     }
 

@@ -30,7 +30,7 @@ viz =
     , description = "A rotating wireframe solid you can spin."
     , starter = toSource cube
     , movable = True
-    , render = \phase source -> Result.map (view phase) (decode source)
+    , render = \source -> Result.map (\m -> \phase -> view phase m) (decode source)
     , controls = controls
     }
 

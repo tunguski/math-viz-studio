@@ -31,7 +31,7 @@ viz =
     , description = "An elementary Wolfram rule, drawn row by row."
     , starter = toSource default
     , movable = False
-    , render = \_ source -> Result.map view (decode source)
+    , render = \source -> Result.map (\m -> always (view m)) (decode source)
     , controls = controls
     }
 

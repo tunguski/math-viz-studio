@@ -35,7 +35,7 @@ viz =
     , description = "Escape-time fractal of z ↦ z² + c — move c and watch it morph."
     , starter = toSource rabbit
     , movable = False
-    , render = \_ source -> Result.map view (decode source)
+    , render = \source -> Result.map (\m -> always (view m)) (decode source)
     , controls = controls
     }
 
