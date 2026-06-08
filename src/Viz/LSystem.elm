@@ -151,9 +151,7 @@ expand rules n s =
         s
 
     else
-        -- NB: a lambda, not `List.map (replace rules)` — the JS backend mis-shares a
-        -- partially-applied *recursive* function's captured argument across map iterations.
-        expand rules (n - 1) (String.concat (List.map (\c -> replace rules c) (String.toList s)))
+        expand rules (n - 1) (String.concat (List.map (replace rules) (String.toList s)))
 
 
 replace : List ( String, String ) -> Char -> String
