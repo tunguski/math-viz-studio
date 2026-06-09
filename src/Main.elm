@@ -28,16 +28,21 @@ import Viz.Bifurcation
 import Viz.Chladni
 import Viz.Clifford
 import Viz.ConvexHull
+import Viz.DeJong
 import Viz.DomainColor
+import Viz.Eigenvectors
+import Viz.Epicycloid
 import Viz.FordCircles
 import Viz.Graph
 import Viz.Harmonograph
+import Viz.Henon
 import Viz.Hilbert
 import Viz.Ifs
 import Viz.Julia
 import Viz.Klein
 import Viz.LSystem
 import Viz.LevyFlight
+import Viz.Lissajous
 import Viz.Lorenz
 import Viz.Mandelbrot
 import Viz.MatrixGrid
@@ -52,6 +57,7 @@ import Viz.SphericalHarmonic
 import Viz.Spirograph
 import Viz.Superformula
 import Viz.SurfacePlot
+import Viz.SvdEllipse
 import Viz.Torus
 import Viz.TorusKnot
 import Viz.Truchet
@@ -65,7 +71,9 @@ registry : List Viz
 registry =
     [ Viz.Harmonograph.viz
     , Viz.MaurerRose.viz
+    , Viz.Lissajous.viz
     , Viz.Spirograph.viz
+    , Viz.Epicycloid.viz
     , Viz.Superformula.viz
     , Viz.Ifs.viz
     , Viz.Julia.viz
@@ -84,9 +92,13 @@ registry =
     , Viz.Lorenz.viz
     , Viz.Rossler.viz
     , Viz.Clifford.viz
+    , Viz.DeJong.viz
+    , Viz.Henon.viz
     , Viz.Bifurcation.viz
     , Viz.VectorField.viz
     , Viz.MatrixGrid.viz
+    , Viz.SvdEllipse.viz
+    , Viz.Eigenvectors.viz
     , Viz.Phyllotaxis.viz
     , Viz.RandomWalk.viz
     , Viz.LevyFlight.viz

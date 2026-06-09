@@ -12,10 +12,11 @@ Baseline for what to build toward:
 ## The visualisations
 
 Each kind of mathematics gets its **own** Elm data structure — `scene = { … }` — a different shape
-per visualisation, drawn live into SVG. The twenty-one kinds span the categories of the Wikipedia
-article above and beyond: plane curves, fractals, geometry, chaos theory, complex analysis, linear
-algebra, topology, graph theory, cellular automata, number theory, wave physics, space-filling
-curves and formal grammars:
+per visualisation, drawn live into SVG. The forty-one kinds span the categories of the Wikipedia
+article above and beyond: plane curves, fractals, parametric surfaces, geometry and computational
+geometry, chaos theory and strange attractors, complex analysis, linear algebra, topology, graph
+theory, cellular automata, number theory, random walks, wave physics, space-filling curves and
+formal grammars:
 
 | Kind | Mathematics | Model (`scene`) |
 |---|---|---|
@@ -45,6 +46,21 @@ curves and formal grammars:
 | **Domain colouring** | A complex function `f(z)` pictured by colour (hue = its angle) | `{ fn, resolution, hue }` |
 | **Matrix transform** | How a 2×2 matrix shears/rotates/scales the plane (linear algebra) | `{ a, b, c, d, lines, stroke }` |
 | **Torus** | A doughnut surface as a spinning wireframe of circles | `{ bigR, smallR, segU, segV, yaw, pitch, stroke }` |
+| **Spherical harmonic** | A sphere rippled by `sin(l·v)·cos(m·u)` lobes (surfaces) | `{ l, m, bump, segU, segV, yaw, pitch, stroke }` |
+| **Möbius strip** | The one-sided band with a half-twist (topology) | `{ width, segU, segV, yaw, pitch, stroke }` |
+| **Klein bottle** | The figure-8 immersion of the one-sided closed surface (topology) | `{ bulge, segU, segV, yaw, pitch, stroke }` |
+| **Surface plot** | The graph `z = f(x, y)` — saddle, monkey saddle, ripple, peak | `{ fn, warp, segU, segV, yaw, pitch, stroke }` |
+| **Lissajous figure** | Two perpendicular oscillations `x = sin(a·t+δ), y = sin(b·t)` | `{ freqX, freqY, phase, samples, stroke }` |
+| **Epicycloid** | A point on a circle rolling around a circle (cardioid, nephroid) | `{ bigR, smallR, samples, stroke }` |
+| **De Jong attractor** | An airy trigonometric strange-attractor cloud | `{ a, b, c, d, points, stroke }` |
+| **Hénon map** | A thin banded strange attractor with fractal cross-section | `{ a, b, points, stroke }` |
+| **Singular values** | A matrix maps the unit circle to an ellipse — its SVD axes (linear algebra) | `{ a, b, c, d, stroke }` |
+| **Eigenvectors** | The invariant directions a matrix only stretches (linear algebra) | `{ a, b, c, d, stroke }` |
+| **Lévy flight** | A heavy-tailed random walk — local clusters and long jumps | `{ steps, seed, alpha, stroke }` |
+| **Voronoi diagram** | The plane carved into cells by nearest site (geometry) | `sites : List (x, y)`, `resolution`, `hue` |
+| **Truchet tiles** | One arc tile in two random orientations, flowing into loops | `{ size, seed, stroke }` |
+| **Ford circles** | A tangent circle packing of the fractions (number theory) | `{ maxQ, stroke }` |
+| **Convex hull** | The rubber-band polygon around a random scatter (computational geometry) | `{ count, seed, stroke }` |
 
 For example, the harmonograph model is just data:
 
