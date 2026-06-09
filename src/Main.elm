@@ -27,7 +27,9 @@ import Viz.Automaton
 import Viz.Bifurcation
 import Viz.Chladni
 import Viz.Clifford
+import Viz.ConvexHull
 import Viz.DomainColor
+import Viz.FordCircles
 import Viz.Graph
 import Viz.Harmonograph
 import Viz.Hilbert
@@ -35,6 +37,7 @@ import Viz.Ifs
 import Viz.Julia
 import Viz.Klein
 import Viz.LSystem
+import Viz.LevyFlight
 import Viz.Lorenz
 import Viz.Mandelbrot
 import Viz.MatrixGrid
@@ -51,8 +54,10 @@ import Viz.Superformula
 import Viz.SurfacePlot
 import Viz.Torus
 import Viz.TorusKnot
+import Viz.Truchet
 import Viz.Ulam
 import Viz.VectorField
+import Viz.Voronoi
 
 
 {-| The configured set of visualisations. Append your own `Viz` here. -}
@@ -84,7 +89,12 @@ registry =
     , Viz.MatrixGrid.viz
     , Viz.Phyllotaxis.viz
     , Viz.RandomWalk.viz
+    , Viz.LevyFlight.viz
     , Viz.Ulam.viz
+    , Viz.Voronoi.viz
+    , Viz.Truchet.viz
+    , Viz.FordCircles.viz
+    , Viz.ConvexHull.viz
     , Viz.Chladni.viz
     , Viz.Graph.viz
     , Viz.Automaton.viz
