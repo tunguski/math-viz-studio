@@ -12,7 +12,7 @@ Baseline for what to build toward:
 ## The visualisations
 
 Each kind of mathematics gets its **own** Elm data structure — `scene = { … }` — a different shape
-per visualisation, drawn live into SVG. The forty-one kinds span the categories of the Wikipedia
+per visualisation, drawn live into SVG. The forty-two kinds span the categories of the Wikipedia
 article above and beyond: plane curves, fractals, parametric surfaces, geometry and computational
 geometry, chaos theory and strange attractors, complex analysis, linear algebra, topology, graph
 theory, cellular automata, number theory, random walks, wave physics, space-filling curves and
@@ -56,6 +56,7 @@ formal grammars:
 | **Hénon map** | A thin banded strange attractor with fractal cross-section | `{ a, b, points, stroke }` |
 | **Singular values** | A matrix maps the unit circle to an ellipse — its SVD axes (linear algebra) | `{ a, b, c, d, stroke }` |
 | **Eigenvectors** | The invariant directions a matrix only stretches (linear algebra) | `{ a, b, c, d, stroke }` |
+| **Polynomial intersections** | Plot several polynomials and list where they cross (solving the systems pᵢ = pⱼ) | `polys : List { coeffs : List Float, color }`, `xMin`, `xMax`, `yMin`, `yMax` |
 | **Lévy flight** | A heavy-tailed random walk — local clusters and long jumps | `{ steps, seed, alpha, stroke }` |
 | **Voronoi diagram** | The plane carved into cells by nearest site (geometry) | `sites : List (x, y)`, `resolution`, `hue` |
 | **Truchet tiles** | One arc tile in two random orientations, flowing into loops | `{ size, seed, stroke }` |

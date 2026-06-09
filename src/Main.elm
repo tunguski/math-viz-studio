@@ -51,6 +51,7 @@ import Viz.Mobius
 import Viz.Newton
 import Viz.Phyllotaxis
 import Viz.Polyhedron
+import Viz.Polynomials
 import Viz.RandomWalk
 import Viz.Rossler
 import Viz.SphericalHarmonic
@@ -99,6 +100,7 @@ registry =
     , Viz.MatrixGrid.viz
     , Viz.SvdEllipse.viz
     , Viz.Eigenvectors.viz
+    , Viz.Polynomials.viz
     , Viz.Phyllotaxis.viz
     , Viz.RandomWalk.viz
     , Viz.LevyFlight.viz
