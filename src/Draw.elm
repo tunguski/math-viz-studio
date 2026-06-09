@@ -4,7 +4,7 @@ module Draw exposing
     , r1, r2
     , fitTransform
     , project, rotate2, centroid
-    , curve, cloud
+    , curve, cloud, surface
     )
 
 {-| Shared **visualisation primitives** — the SVG drawing helpers every visualisation reaches for, so
@@ -159,6 +159,51 @@ dots width color pts =
         , A.opacity "0.85"
         ]
         []
+
+
+{-| Draw a parametric surface as a wireframe. `grid` is `us × vs` points (row-major: index
+`ui * vs + vj`); they are rotated by `yaw`/`pitch`, fitted to the frame, and joined into two families
+of lines — the v-lines (close them with `closeV` when the surface is periodic in v) and the u-lines
+(`closeU` for periodicity in u). One `<path>`, so even a fine mesh is one DOM node. -}
+surface : Float -> Float -> Int -> Int -> Bool -> Bool -> List Vec3 -> String -> Svg msg
+surface yaw pitch us vs closeU closeV grid color =
+    let
+        proj =
+            List.map (rotate2 yaw pitch) grid
+
+        ( cx, cy, scale ) =
+            fitTransform proj
+
+        arr =
+            Array.fromList (List.map (\( x, y ) -> ( (x - cx) * scale, -(y - cy) * scale )) proj)
+
+        at ui vj =
+            case Array.get (ui * vs + vj) arr of
+                Just ( x, y ) ->
+                    r1 x ++ " " ++ r1 y
+
+                Nothing ->
+                    "0 0"
+
+        uLine ui =
+            "M" ++ at ui 0 ++ String.concat (List.map (\vj -> "L" ++ at ui vj) (List.range 1 (vs - 1))) ++ close closeV (at ui 0)
+
+        vLine vj =
+            "M" ++ at 0 vj ++ String.concat (List.map (\ui -> "L" ++ at ui vj) (List.range 1 (us - 1))) ++ close closeU (at 0 vj)
+
+        path =
+            String.concat (List.map uLine (List.range 0 (us - 1)) ++ List.map vLine (List.range 0 (vs - 1)))
+    in
+    stage [ Svg.path [ A.d path, A.fill "none", A.stroke color, A.strokeWidth "1", A.opacity "0.82", A.strokeLinejoin "round" ] [] ]
+
+
+close : Bool -> String -> String
+close yes first =
+    if yes then
+        "L" ++ first
+
+    else
+        ""
 
 
 {-| The shared frame: a centred 600×600 viewBox the renderers draw into (origin in the middle, the

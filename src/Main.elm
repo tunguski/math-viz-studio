@@ -33,18 +33,22 @@ import Viz.Harmonograph
 import Viz.Hilbert
 import Viz.Ifs
 import Viz.Julia
+import Viz.Klein
 import Viz.LSystem
 import Viz.Lorenz
 import Viz.Mandelbrot
 import Viz.MatrixGrid
 import Viz.MaurerRose
+import Viz.Mobius
 import Viz.Newton
 import Viz.Phyllotaxis
 import Viz.Polyhedron
 import Viz.RandomWalk
 import Viz.Rossler
+import Viz.SphericalHarmonic
 import Viz.Spirograph
 import Viz.Superformula
+import Viz.SurfacePlot
 import Viz.Torus
 import Viz.TorusKnot
 import Viz.Ulam
@@ -67,6 +71,10 @@ registry =
     , Viz.Hilbert.viz
     , Viz.Polyhedron.viz
     , Viz.Torus.viz
+    , Viz.SphericalHarmonic.viz
+    , Viz.Mobius.viz
+    , Viz.Klein.viz
+    , Viz.SurfacePlot.viz
     , Viz.TorusKnot.viz
     , Viz.Lorenz.viz
     , Viz.Rossler.viz
