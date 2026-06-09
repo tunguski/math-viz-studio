@@ -171,6 +171,11 @@ ELM=../../elm.sh EDITOR=../elm-editor ./build.sh        # or:  ./build.ps1  on W
 elm-lang example apps do), and assemble the host page. On Windows, point `ELM` at the jar, e.g.
 `$env:ELM = 'java -jar ..\..\target\elm.jar'; ./build.ps1`.
 
+The build also compiles `src/Catalogue.elm` to `build/catalogue.js` and emits `catalogue.html`: a
+**static reference page** generated from the same registry, with one section per visualisation — a
+live sample, the defining formula (drawn as SVG), and the description. Open it at `/catalogue.html`
+(there's a link from the studio, bottom-right).
+
 The whole toolchain is the elm-lang CLI: `elm make` compiles the app, and `elm server … --static`
 serves it (the `serve.elm` file is a trivial handler so the `--static build` flag serves `build/`
 straight from disk). No Node, no `npx`.

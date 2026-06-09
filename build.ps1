@@ -29,11 +29,16 @@ $P = (Get-Location).Path
 Write-Host "Compiling MathViz Studio with: $Elm"
 & cmd /c "$Elm make `"$P/src/Main.elm`" --project=`"$P/elm.json`" -o `"$P/$Out/app.js`" --no-check" | Out-Null
 
+# 2b) Compile the static Catalogue page (one section per visualisation), from the same registry.
+Write-Host "Compiling the Catalogue page"
+& cmd /c "$Elm make `"$P/src/Catalogue.elm`" --project=`"$P/elm.json`" -o `"$P/$Out/catalogue.js`" --no-check" | Out-Null
+
 # 3) The editor shell's stylesheet (the .ed-* IDE chrome the host page layers its studio styles on).
 Copy-Item (Join-Path $Editor 'editor.css') "$Out/editor.css" -Force
 
-# 4) The host page (editor shell CSS + studio overlay, the app, and the clipboard port wiring).
+# 4) The host pages (the studio, and the static catalogue).
 Copy-Item index.template.html "$Out/index.html" -Force
+Copy-Item catalogue.template.html "$Out/catalogue.html" -Force
 
 Write-Host "Done. Serve it with the elm-lang CLI itself (no Node needed):"
 Write-Host "  $Elm server serve.elm --static $Out --port 8000   # then open http://localhost:8000/"

@@ -35,11 +35,17 @@ P="$(pwd)"
 echo "Compiling MathViz Studio with: $ELM"
 $ELM make "$P/src/Main.elm" --project="$P/elm.json" -o "$P/$OUT/app.js" --no-check >/dev/null
 
+# 2b) Compile the static Catalogue page — one section per visualisation (sample + formula + blurb),
+#     generated from the same registry. Its own entry point and host page; no ports.
+echo "Compiling the Catalogue page"
+$ELM make "$P/src/Catalogue.elm" --project="$P/elm.json" -o "$P/$OUT/catalogue.js" --no-check >/dev/null
+
 # 3) The editor shell's stylesheet (the .ed-* IDE chrome the host page layers its studio styles on).
 cp "$EDITOR/editor.css" "$OUT/editor.css"
 
-# 4) The host page (editor shell CSS + studio overlay, the compiled app, the clipboard port).
+# 4) The host pages (the studio, and the static catalogue).
 cp index.template.html "$OUT/index.html"
+cp catalogue.template.html "$OUT/catalogue.html"
 
 echo "Done. Serve it with the elm-lang CLI itself (no Node needed):"
 echo "  $ELM server serve.elm --static $OUT --port 8000   # then open http://localhost:8000/"

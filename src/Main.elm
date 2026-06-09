@@ -1,4 +1,4 @@
-module Main exposing (main)
+module Main exposing (main, registry)
 
 {-| MathViz Studio — a visual builder for mathematical visualisations, built on the reusable `Editor`
 shell and a **registry** of visualisations.
