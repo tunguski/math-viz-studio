@@ -27,18 +27,17 @@ for m in Highlight CodeEditor Share Preview Editor; do
   cp "$EDITOR/src/$m.elm" "vendor/$m.elm"
 done
 
-# 2) Compile the app (the editor widget leans on idioms the strict type checker doesn't fully
-#    analyse, so — like the other elm-lang example apps — we compile with --no-check). Absolute paths
-#    are used because the elm.sh wrapper chdirs to the elm-lang project before running.
+# 2) Compile the app (it type-checks cleanly, like the other elm-lang example apps). Absolute
+#    paths are used because the elm.sh wrapper chdirs to the elm-lang project before running.
 mkdir -p "$OUT"
 P="$(pwd)"
 echo "Compiling MathViz Studio with: $ELM"
-$ELM make "$P/src/Main.elm" --project="$P/elm.json" -o "$P/$OUT/app.js" --no-check >/dev/null
+$ELM make "$P/src/Main.elm" --project="$P/elm.json" -o "$P/$OUT/app.js" >/dev/null
 
 # 2b) Compile the static Catalogue page — one section per visualisation (sample + formula + blurb),
 #     generated from the same registry. Its own entry point and host page; no ports.
 echo "Compiling the Catalogue page"
-$ELM make "$P/src/Catalogue.elm" --project="$P/elm.json" -o "$P/$OUT/catalogue.js" --no-check >/dev/null
+$ELM make "$P/src/Catalogue.elm" --project="$P/elm.json" -o "$P/$OUT/catalogue.js" >/dev/null
 
 # 3) The editor shell's stylesheet (the .ed-* IDE chrome the host page layers its studio styles on).
 cp "$EDITOR/editor.css" "$OUT/editor.css"
