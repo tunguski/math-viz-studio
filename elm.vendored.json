@@ -1,0 +1,11 @@
+{
+    "dependencies": [
+        {
+            "name": "elm-editor",
+            "repo": "https://github.com/tunguski/elm-editor.git",
+            "ref": "master",
+            "source": "src",
+            "include": ["Highlight.elm", "CodeEditor.elm", "Share.elm", "Preview.elm", "Editor.elm"]
+        }
+    ]
+}

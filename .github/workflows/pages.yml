@@ -30,12 +30,11 @@ jobs:
       - name: Check out this project
         uses: actions/checkout@v4
 
-      # The elm-lang CLI (the compiler) and the elm-editor checkout (this app vendors its shell
-      # modules) live in sibling tunguski repos.
-      - name: Check out elm-lang (compiler) and elm-editor (vendored shell)
+      # Only the elm-lang CLI (the compiler) is checked out here; the editor shell is a source
+      # dependency declared in elm.vendored.json and cloned by the compiler at build time.
+      - name: Check out the elm-lang compiler
         run: |
-          git clone --depth 1 --branch master https://github.com/tunguski/elm-lang.git   elm-lang
-          git clone --depth 1 --branch master https://github.com/tunguski/elm-editor.git elm-editor
+          git clone --depth 1 --branch master https://github.com/tunguski/elm-lang.git elm-lang
 
       - name: Set up GraalVM for JDK 25
         uses: graalvm/setup-graalvm@v1
@@ -53,7 +52,6 @@ jobs:
       - name: Build MathViz Studio
         env:
           ELM: java -jar ${{ github.workspace }}/elm-lang/target/elm.jar
-          EDITOR: ${{ github.workspace }}/elm-editor
         run: |
           chmod +x ./build.sh
           ./build.sh

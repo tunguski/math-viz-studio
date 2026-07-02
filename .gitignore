@@ -1,3 +1,5 @@
 build/
 vendor/
 elm-stuff/
+git-deps/
+elm.vendored.local.json
