@@ -127,12 +127,15 @@ Shared infrastructure (one place each, reused by every visualisation):
 | `Draw` | **visualisation** | SVG primitives — the shared `stage`, coordinate rounding, `fitTransform`, the 3-D `project`/`rotate2`/`centroid`, and `curve` (a colourable, optionally banded polyline). |
 | `Color` | **visualisation** | The pluggable colour-evolution registry: `fixed`/`cycle`/`gradient`/`pulse`, resolved from a base colour to a `Coloring`. |
 | `Form` | **controls** | The Build-panel widgets (`slider`, `colorRow`, `numCell`, `preset`, …); each returns `Html String` whose message *is* the new scene source. |
-| `Viz` | **contract** | The plugin record `Viz` (`kind`, `name`, `description`, `starter`, `movable`, `render`, `controls`) and `find`. The model type stays hidden inside each module. |
+| `Viz` | **contract** | The plugin record `Viz` (`kind`, `name`, `description`, `about`, `starter`, `movable`, `render`, `controls`) and `find`. The model type stays hidden inside each module. |
 
 The visualisations (each `src/Viz/*.elm` is model + decode/print + render + controls behind one `viz`):
-`Harmonograph`, `MaurerRose`, `Superformula`, `Ifs`, `Julia`, `Mandelbrot`, `Newton`, `LSystem`,
-`Hilbert`, `Polyhedron`, `TorusKnot`, `Lorenz`, `Rossler`, `Clifford`, `Bifurcation`, `VectorField`,
-`Phyllotaxis`, `Ulam`, `Chladni`, `Graph`, `Automaton`.
+`Harmonograph`, `MaurerRose`, `Lissajous`, `Spirograph`, `Epicycloid`, `Superformula`, `Ifs`,
+`Julia`, `Mandelbrot`, `Newton`, `DomainColor`, `LSystem`, `Hilbert`, `Polyhedron`, `Torus`,
+`SphericalHarmonic`, `Mobius`, `Klein`, `SurfacePlot`, `TorusKnot`, `Lorenz`, `Rossler`, `Clifford`,
+`DeJong`, `Henon`, `Bifurcation`, `VectorField`, `MatrixGrid`, `SvdEllipse`, `Eigenvectors`,
+`Polynomials`, `Phyllotaxis`, `RandomWalk`, `LevyFlight`, `Ulam`, `Voronoi`, `Truchet`, `FordCircles`,
+`ConvexHull`, `Chladni`, `Graph`, `Automaton`.
 
 The studio shell:
 
@@ -155,8 +158,10 @@ A user shipping their *own* set just edits that one list.
 
 ## Build & run
 
-You need the [elm-lang](https://github.com/tunguski/elm-lang) CLI and a checkout of
-[elm-editor](../elm-editor) next door (the shell modules are vendored from it at build time).
+You need the [elm-lang](https://github.com/tunguski/elm-lang) CLI. The shell modules are declared in
+`elm.vendored.json` and resolved by the compiler at build time — either cloned from
+[elm-editor](../elm-editor) at the pinned ref, or taken from a local checkout named in
+`elm.vendored.local.json`. `EDITOR` still points at an elm-editor checkout for its `editor.css`.
 
 ```sh
 # from this directory; ELM is the elm-lang CLI, EDITOR the elm-editor checkout
@@ -166,10 +171,12 @@ ELM=../../elm.sh EDITOR=../elm-editor ./build.sh        # or:  ./build.ps1  on W
 ../../elm.sh server serve.elm --static build --port 8000   # then open http://localhost:8000/
 ```
 
-`build.sh` / `build.ps1` copy the shell modules (`Highlight`, `CodeEditor`, `Share`, `Preview`,
-`Editor`) into `vendor/`, compile `src/Main.elm` to `build/app.js` with `--no-check` (as the other
-elm-lang example apps do), and assemble the host page. On Windows, point `ELM` at the jar, e.g.
-`$env:ELM = 'java -jar ..\..\target\elm.jar'; ./build.ps1`.
+`build.sh` declares the shell modules (`Highlight`, `CodeEditor`, `Share`, `Preview`, `Editor`) in
+[`elm.vendored.json`](elm.vendored.json) — the compiler resolves them at build time (from a clone at
+the pinned ref, or from the local checkout named in `elm.vendored.local.json`) — then compiles
+`src/Main.elm` to `build/app.js` (it type-checks cleanly, so no `--no-check`) and assembles the host
+page. `build.ps1` is the Windows path; it copies the shell modules into `vendor/` instead. On Windows,
+point `ELM` at the jar, e.g. `$env:ELM = 'java -jar ..\..\target\elm.jar'; ./build.ps1`.
 
 The build also compiles `src/Catalogue.elm` to `build/catalogue.js` and emits `catalogue.html`: a
 **static reference page** generated from the same registry, with one section per visualisation — a
@@ -183,10 +190,11 @@ straight from disk). No Node, no `npx`.
 ## Deploying (GitHub Pages)
 
 [`.github/workflows/pages.yml`](.github/workflows/pages.yml) builds and publishes the site on every
-push to `master`/`main`. CI checks out this repo plus the sibling `tunguski/elm-lang` (the compiler)
-and `tunguski/elm-editor` (the vendored shell), builds the elm-lang `elm.jar` with Maven, runs
-`build.sh` (so the site is compiled by the same elm-lang CLI), and deploys `build/` to Pages. Enable
-it under **Settings → Pages → Source: GitHub Actions**.
+push to `master`/`main`. CI checks out this repo plus the sibling `tunguski/elm-lang` (the compiler),
+builds the elm-lang `elm.jar` with Maven, and runs `build.sh` (so the site is compiled by the same
+elm-lang CLI) — the editor shell is a source dependency declared in `elm.vendored.json` and cloned by
+the compiler at build time, so it needs no separate checkout. The workflow then deploys `build/` to
+Pages. Enable it under **Settings → Pages → Source: GitHub Actions**.
 
 ### Notes for the elm-lang JS backend
 
